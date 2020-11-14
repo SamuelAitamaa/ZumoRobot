@@ -1,0 +1,6 @@
+C:\Users\samue\Desktop\RobotRage2\Zumo\ZumoBot.cydsn\ZumoBot.cyprj|18e78b8f-b448-4951-a524-71f85eeda737
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|26eb030f-39ff-4a1a-9e77-4c0413972ce6
+C:\Users\samue\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Downloads ( 4.2).cyprj|ec0b3cb6-7caa-4120-b570-4dd6993bf498
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|cc72102e-dbcf-4b9e-bd37-a760d90231b1
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|4fe9d51c-84f6-4778-b6d6-8cd9a77c6617
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|3ad0c228-e4b4-4a6a-a406-f06af98b539c

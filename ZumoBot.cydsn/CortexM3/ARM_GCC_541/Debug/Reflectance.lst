@@ -1,0 +1,3021 @@
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"Reflectance.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.ReflectanceTask,"ax",%progbits
+  20              		.align	2
+  21              		.global	ReflectanceTask
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	ReflectanceTask, %function
+  25              	ReflectanceTask:
+  26              	.LFB69:
+  27              		.file 1 "ZumoLibrary\\Reflectance.c"
+   1:ZumoLibrary/Reflectance.c **** /**
+   2:ZumoLibrary/Reflectance.c ****  * @file    Reflectance.c
+   3:ZumoLibrary/Reflectance.c ****  * @brief   Basic methods for operating reflectance sensor. For more details, please refer to Refle
+   4:ZumoLibrary/Reflectance.c ****  * @details included in Zumo shield
+   5:ZumoLibrary/Reflectance.c **** */
+   6:ZumoLibrary/Reflectance.c **** #include <stdio.h>
+   7:ZumoLibrary/Reflectance.c **** #include <stdbool.h>
+   8:ZumoLibrary/Reflectance.c **** #include "project.h"
+   9:ZumoLibrary/Reflectance.c **** #include "FreeRTOS.h"
+  10:ZumoLibrary/Reflectance.c **** #include "task.h"
+  11:ZumoLibrary/Reflectance.c **** 
+  12:ZumoLibrary/Reflectance.c **** #include "Reflectance.h"
+  13:ZumoLibrary/Reflectance.c **** 
+  14:ZumoLibrary/Reflectance.c **** static volatile struct sensors_ sensors;
+  15:ZumoLibrary/Reflectance.c **** static volatile struct sensors_  digital_sensor_value;
+  16:ZumoLibrary/Reflectance.c **** static struct sensors_ threshold = { 10000, 10000, 10000, 10000, 10000, 10000};
+  17:ZumoLibrary/Reflectance.c **** static TaskHandle_t ReflectanceHandle = NULL;
+  18:ZumoLibrary/Reflectance.c **** 
+  19:ZumoLibrary/Reflectance.c **** /**
+  20:ZumoLibrary/Reflectance.c **** * @brief    Reflectance Sensor handler is called from FreeRTOS systick hook
+  21:ZumoLibrary/Reflectance.c **** * @details  Measuring each sensors' time to recognition of white or black
+  22:ZumoLibrary/Reflectance.c **** */
+  23:ZumoLibrary/Reflectance.c **** void ReflectanceTask( void *pvParameters )
+  24:ZumoLibrary/Reflectance.c **** {
+  28              		.loc 1 24 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 8
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 2
+
+
+  34              		.cfi_def_cfa_offset 28
+  35              		.cfi_offset 4, -28
+  36              		.cfi_offset 5, -24
+  37              		.cfi_offset 6, -20
+  38              		.cfi_offset 7, -16
+  39              		.cfi_offset 8, -12
+  40              		.cfi_offset 9, -8
+  41              		.cfi_offset 14, -4
+  42 0004 83B0     		sub	sp, sp, #12
+  43              		.cfi_def_cfa_offset 40
+  25:ZumoLibrary/Reflectance.c ****     (void) pvParameters;
+  26:ZumoLibrary/Reflectance.c ****     
+  27:ZumoLibrary/Reflectance.c ****     TickType_t prev;
+  28:ZumoLibrary/Reflectance.c ****     uint32_t statusR1;
+  29:ZumoLibrary/Reflectance.c ****     uint32_t statusR2;
+  30:ZumoLibrary/Reflectance.c ****     uint32_t statusR3;
+  31:ZumoLibrary/Reflectance.c ****     uint32_t statusL3;
+  32:ZumoLibrary/Reflectance.c ****     uint32_t statusL2;
+  33:ZumoLibrary/Reflectance.c ****     uint32_t statusL1;
+  34:ZumoLibrary/Reflectance.c ****     
+  35:ZumoLibrary/Reflectance.c ****     prev = xTaskGetTickCount();
+  44              		.loc 1 35 0
+  45 0006 FFF7FEFF 		bl	xTaskGetTickCount
+  46              	.LVL1:
+  47 000a 0190     		str	r0, [sp, #4]
+  48              	.L14:
+  36:ZumoLibrary/Reflectance.c ****     
+  37:ZumoLibrary/Reflectance.c ****     while(1) {
+  38:ZumoLibrary/Reflectance.c ****         statusR1 = Timer_R1_ReadStatusRegister();
+  49              		.loc 1 38 0
+  50 000c FFF7FEFF 		bl	Timer_R1_ReadStatusRegister
+  51              	.LVL2:
+  52 0010 0446     		mov	r4, r0
+  53              	.LVL3:
+  39:ZumoLibrary/Reflectance.c ****         statusR2 = Timer_R2_ReadStatusRegister();
+  54              		.loc 1 39 0
+  55 0012 FFF7FEFF 		bl	Timer_R2_ReadStatusRegister
+  56              	.LVL4:
+  57 0016 8046     		mov	r8, r0
+  58              	.LVL5:
+  40:ZumoLibrary/Reflectance.c ****         statusR3 = Timer_R3_ReadStatusRegister();
+  59              		.loc 1 40 0
+  60 0018 FFF7FEFF 		bl	Timer_R3_ReadStatusRegister
+  61              	.LVL6:
+  62 001c 0646     		mov	r6, r0
+  63              	.LVL7:
+  41:ZumoLibrary/Reflectance.c ****         statusL3 = Timer_L3_ReadStatusRegister();
+  64              		.loc 1 41 0
+  65 001e FFF7FEFF 		bl	Timer_L3_ReadStatusRegister
+  66              	.LVL8:
+  67 0022 0546     		mov	r5, r0
+  68              	.LVL9:
+  42:ZumoLibrary/Reflectance.c ****         statusL2 = Timer_L2_ReadStatusRegister();
+  69              		.loc 1 42 0
+  70 0024 FFF7FEFF 		bl	Timer_L2_ReadStatusRegister
+  71              	.LVL10:
+  72 0028 0746     		mov	r7, r0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 3
+
+
+  73              	.LVL11:
+  43:ZumoLibrary/Reflectance.c ****         statusL1 = Timer_L1_ReadStatusRegister();
+  74              		.loc 1 43 0
+  75 002a FFF7FEFF 		bl	Timer_L1_ReadStatusRegister
+  76              	.LVL12:
+  77 002e 8146     		mov	r9, r0
+  78              	.LVL13:
+  44:ZumoLibrary/Reflectance.c **** 
+  45:ZumoLibrary/Reflectance.c ****         if(statusR1 & Timer_R1_STATUS_CAPTURE) {
+  79              		.loc 1 45 0
+  80 0030 14F0400F 		tst	r4, #64
+  81 0034 09D0     		beq	.L2
+  46:ZumoLibrary/Reflectance.c ****             sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCapture();
+  82              		.loc 1 46 0
+  83 0036 FFF7FEFF 		bl	Timer_R1_ReadPeriod
+  84              	.LVL14:
+  85 003a 0446     		mov	r4, r0
+  86              	.LVL15:
+  87 003c FFF7FEFF 		bl	Timer_R1_ReadCapture
+  88              	.LVL16:
+  89 0040 201A     		subs	r0, r4, r0
+  90 0042 80B2     		uxth	r0, r0
+  91 0044 5E4B     		ldr	r3, .L16
+  92 0046 D880     		strh	r0, [r3, #6]	@ movhi
+  93 0048 08E0     		b	.L3
+  94              	.LVL17:
+  95              	.L2:
+  47:ZumoLibrary/Reflectance.c ****         }
+  48:ZumoLibrary/Reflectance.c ****         else {
+  49:ZumoLibrary/Reflectance.c ****             sensors.r1 = Timer_R1_ReadPeriod() - Timer_R1_ReadCounter();
+  96              		.loc 1 49 0
+  97 004a FFF7FEFF 		bl	Timer_R1_ReadPeriod
+  98              	.LVL18:
+  99 004e 0446     		mov	r4, r0
+ 100              	.LVL19:
+ 101 0050 FFF7FEFF 		bl	Timer_R1_ReadCounter
+ 102              	.LVL20:
+ 103 0054 201A     		subs	r0, r4, r0
+ 104 0056 80B2     		uxth	r0, r0
+ 105 0058 594B     		ldr	r3, .L16
+ 106 005a D880     		strh	r0, [r3, #6]	@ movhi
+ 107              	.L3:
+  50:ZumoLibrary/Reflectance.c ****         }
+  51:ZumoLibrary/Reflectance.c ****         
+  52:ZumoLibrary/Reflectance.c ****         if(statusL1 & Timer_L1_STATUS_CAPTURE) {
+ 108              		.loc 1 52 0
+ 109 005c 19F0400F 		tst	r9, #64
+ 110 0060 09D0     		beq	.L4
+  53:ZumoLibrary/Reflectance.c ****             sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCapture();
+ 111              		.loc 1 53 0
+ 112 0062 FFF7FEFF 		bl	Timer_L1_ReadPeriod
+ 113              	.LVL21:
+ 114 0066 0446     		mov	r4, r0
+ 115 0068 FFF7FEFF 		bl	Timer_L1_ReadCapture
+ 116              	.LVL22:
+ 117 006c 201A     		subs	r0, r4, r0
+ 118 006e 80B2     		uxth	r0, r0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 4
+
+
+ 119 0070 534B     		ldr	r3, .L16
+ 120 0072 9880     		strh	r0, [r3, #4]	@ movhi
+ 121 0074 08E0     		b	.L5
+ 122              	.L4:
+  54:ZumoLibrary/Reflectance.c ****         }
+  55:ZumoLibrary/Reflectance.c ****         else {
+  56:ZumoLibrary/Reflectance.c ****             sensors.l1 = Timer_L1_ReadPeriod() - Timer_L1_ReadCounter();
+ 123              		.loc 1 56 0
+ 124 0076 FFF7FEFF 		bl	Timer_L1_ReadPeriod
+ 125              	.LVL23:
+ 126 007a 0446     		mov	r4, r0
+ 127 007c FFF7FEFF 		bl	Timer_L1_ReadCounter
+ 128              	.LVL24:
+ 129 0080 201A     		subs	r0, r4, r0
+ 130 0082 80B2     		uxth	r0, r0
+ 131 0084 4E4B     		ldr	r3, .L16
+ 132 0086 9880     		strh	r0, [r3, #4]	@ movhi
+ 133              	.L5:
+  57:ZumoLibrary/Reflectance.c ****         }
+  58:ZumoLibrary/Reflectance.c **** 
+  59:ZumoLibrary/Reflectance.c ****         if(statusR2 & Timer_R2_STATUS_CAPTURE) {
+ 134              		.loc 1 59 0
+ 135 0088 18F0020F 		tst	r8, #2
+ 136 008c 09D0     		beq	.L6
+  60:ZumoLibrary/Reflectance.c ****             sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCapture();
+ 137              		.loc 1 60 0
+ 138 008e FFF7FEFF 		bl	Timer_R2_ReadPeriod
+ 139              	.LVL25:
+ 140 0092 0446     		mov	r4, r0
+ 141 0094 FFF7FEFF 		bl	Timer_R2_ReadCapture
+ 142              	.LVL26:
+ 143 0098 201A     		subs	r0, r4, r0
+ 144 009a 80B2     		uxth	r0, r0
+ 145 009c 484B     		ldr	r3, .L16
+ 146 009e 1881     		strh	r0, [r3, #8]	@ movhi
+ 147 00a0 08E0     		b	.L7
+ 148              	.L6:
+  61:ZumoLibrary/Reflectance.c ****         }
+  62:ZumoLibrary/Reflectance.c ****         else {
+  63:ZumoLibrary/Reflectance.c ****             sensors.r2 = Timer_R2_ReadPeriod() - Timer_R2_ReadCounter();
+ 149              		.loc 1 63 0
+ 150 00a2 FFF7FEFF 		bl	Timer_R2_ReadPeriod
+ 151              	.LVL27:
+ 152 00a6 0446     		mov	r4, r0
+ 153 00a8 FFF7FEFF 		bl	Timer_R2_ReadCounter
+ 154              	.LVL28:
+ 155 00ac 201A     		subs	r0, r4, r0
+ 156 00ae 80B2     		uxth	r0, r0
+ 157 00b0 434B     		ldr	r3, .L16
+ 158 00b2 1881     		strh	r0, [r3, #8]	@ movhi
+ 159              	.L7:
+  64:ZumoLibrary/Reflectance.c ****         }
+  65:ZumoLibrary/Reflectance.c ****         
+  66:ZumoLibrary/Reflectance.c ****         if(statusL2 & Timer_L2_STATUS_CAPTURE) {
+ 160              		.loc 1 66 0
+ 161 00b4 17F0020F 		tst	r7, #2
+ 162 00b8 09D0     		beq	.L8
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 5
+
+
+  67:ZumoLibrary/Reflectance.c ****             sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCapture();
+ 163              		.loc 1 67 0
+ 164 00ba FFF7FEFF 		bl	Timer_L2_ReadPeriod
+ 165              	.LVL29:
+ 166 00be 0446     		mov	r4, r0
+ 167 00c0 FFF7FEFF 		bl	Timer_L2_ReadCapture
+ 168              	.LVL30:
+ 169 00c4 201A     		subs	r0, r4, r0
+ 170 00c6 80B2     		uxth	r0, r0
+ 171 00c8 3D4B     		ldr	r3, .L16
+ 172 00ca 5880     		strh	r0, [r3, #2]	@ movhi
+ 173 00cc 08E0     		b	.L9
+ 174              	.L8:
+  68:ZumoLibrary/Reflectance.c ****         }
+  69:ZumoLibrary/Reflectance.c ****         else {
+  70:ZumoLibrary/Reflectance.c ****             sensors.l2 = Timer_L2_ReadPeriod() - Timer_L2_ReadCounter();
+ 175              		.loc 1 70 0
+ 176 00ce FFF7FEFF 		bl	Timer_L2_ReadPeriod
+ 177              	.LVL31:
+ 178 00d2 0446     		mov	r4, r0
+ 179 00d4 FFF7FEFF 		bl	Timer_L2_ReadCounter
+ 180              	.LVL32:
+ 181 00d8 201A     		subs	r0, r4, r0
+ 182 00da 80B2     		uxth	r0, r0
+ 183 00dc 384B     		ldr	r3, .L16
+ 184 00de 5880     		strh	r0, [r3, #2]	@ movhi
+ 185              	.L9:
+  71:ZumoLibrary/Reflectance.c ****         }
+  72:ZumoLibrary/Reflectance.c ****         
+  73:ZumoLibrary/Reflectance.c ****         if(statusR3 & Timer_R3_STATUS_CAPTURE) {
+ 186              		.loc 1 73 0
+ 187 00e0 16F0400F 		tst	r6, #64
+ 188 00e4 09D0     		beq	.L10
+  74:ZumoLibrary/Reflectance.c ****             sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCapture();
+ 189              		.loc 1 74 0
+ 190 00e6 FFF7FEFF 		bl	Timer_R3_ReadPeriod
+ 191              	.LVL33:
+ 192 00ea 0446     		mov	r4, r0
+ 193 00ec FFF7FEFF 		bl	Timer_R3_ReadCapture
+ 194              	.LVL34:
+ 195 00f0 201A     		subs	r0, r4, r0
+ 196 00f2 80B2     		uxth	r0, r0
+ 197 00f4 324B     		ldr	r3, .L16
+ 198 00f6 5881     		strh	r0, [r3, #10]	@ movhi
+ 199 00f8 08E0     		b	.L11
+ 200              	.L10:
+  75:ZumoLibrary/Reflectance.c ****         }
+  76:ZumoLibrary/Reflectance.c ****         else {
+  77:ZumoLibrary/Reflectance.c ****             sensors.r3 = Timer_R3_ReadPeriod() - Timer_R3_ReadCounter();
+ 201              		.loc 1 77 0
+ 202 00fa FFF7FEFF 		bl	Timer_R3_ReadPeriod
+ 203              	.LVL35:
+ 204 00fe 0446     		mov	r4, r0
+ 205 0100 FFF7FEFF 		bl	Timer_R3_ReadCounter
+ 206              	.LVL36:
+ 207 0104 201A     		subs	r0, r4, r0
+ 208 0106 80B2     		uxth	r0, r0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 6
+
+
+ 209 0108 2D4B     		ldr	r3, .L16
+ 210 010a 5881     		strh	r0, [r3, #10]	@ movhi
+ 211              	.L11:
+  78:ZumoLibrary/Reflectance.c ****         }
+  79:ZumoLibrary/Reflectance.c ****         
+  80:ZumoLibrary/Reflectance.c ****         if(statusL3 & Timer_L3_STATUS_CAPTURE) {
+ 212              		.loc 1 80 0
+ 213 010c 15F0400F 		tst	r5, #64
+ 214 0110 09D0     		beq	.L12
+  81:ZumoLibrary/Reflectance.c ****             sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCapture();
+ 215              		.loc 1 81 0
+ 216 0112 FFF7FEFF 		bl	Timer_L3_ReadPeriod
+ 217              	.LVL37:
+ 218 0116 0446     		mov	r4, r0
+ 219 0118 FFF7FEFF 		bl	Timer_L3_ReadCapture
+ 220              	.LVL38:
+ 221 011c 201A     		subs	r0, r4, r0
+ 222 011e 80B2     		uxth	r0, r0
+ 223 0120 274B     		ldr	r3, .L16
+ 224 0122 1880     		strh	r0, [r3]	@ movhi
+ 225 0124 08E0     		b	.L13
+ 226              	.L12:
+  82:ZumoLibrary/Reflectance.c ****         }
+  83:ZumoLibrary/Reflectance.c ****         else {
+  84:ZumoLibrary/Reflectance.c ****             sensors.l3 = Timer_L3_ReadPeriod() - Timer_L3_ReadCounter();
+ 227              		.loc 1 84 0
+ 228 0126 FFF7FEFF 		bl	Timer_L3_ReadPeriod
+ 229              	.LVL39:
+ 230 012a 0446     		mov	r4, r0
+ 231 012c FFF7FEFF 		bl	Timer_L3_ReadCounter
+ 232              	.LVL40:
+ 233 0130 201A     		subs	r0, r4, r0
+ 234 0132 80B2     		uxth	r0, r0
+ 235 0134 224B     		ldr	r3, .L16
+ 236 0136 1880     		strh	r0, [r3]	@ movhi
+ 237              	.L13:
+  85:ZumoLibrary/Reflectance.c ****         }
+  86:ZumoLibrary/Reflectance.c ****         
+  87:ZumoLibrary/Reflectance.c ****         
+  88:ZumoLibrary/Reflectance.c ****         Timer_Reset_Write(1);
+ 238              		.loc 1 88 0
+ 239 0138 0120     		movs	r0, #1
+ 240 013a FFF7FEFF 		bl	Timer_Reset_Write
+ 241              	.LVL41:
+  89:ZumoLibrary/Reflectance.c ****         
+  90:ZumoLibrary/Reflectance.c ****         R1_SetDriveMode(PIN_DM_STRONG);
+ 242              		.loc 1 90 0
+ 243 013e 0C20     		movs	r0, #12
+ 244 0140 FFF7FEFF 		bl	R1_SetDriveMode
+ 245              	.LVL42:
+  91:ZumoLibrary/Reflectance.c ****         R1_Write(1);
+ 246              		.loc 1 91 0
+ 247 0144 0120     		movs	r0, #1
+ 248 0146 FFF7FEFF 		bl	R1_Write
+ 249              	.LVL43:
+  92:ZumoLibrary/Reflectance.c ****         R2_SetDriveMode(PIN_DM_STRONG);
+ 250              		.loc 1 92 0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 7
+
+
+ 251 014a 0C20     		movs	r0, #12
+ 252 014c FFF7FEFF 		bl	R2_SetDriveMode
+ 253              	.LVL44:
+  93:ZumoLibrary/Reflectance.c ****         R2_Write(1);
+ 254              		.loc 1 93 0
+ 255 0150 0120     		movs	r0, #1
+ 256 0152 FFF7FEFF 		bl	R2_Write
+ 257              	.LVL45:
+  94:ZumoLibrary/Reflectance.c ****         R3_SetDriveMode(PIN_DM_STRONG);
+ 258              		.loc 1 94 0
+ 259 0156 0C20     		movs	r0, #12
+ 260 0158 FFF7FEFF 		bl	R3_SetDriveMode
+ 261              	.LVL46:
+  95:ZumoLibrary/Reflectance.c ****         R3_Write(1);
+ 262              		.loc 1 95 0
+ 263 015c 0120     		movs	r0, #1
+ 264 015e FFF7FEFF 		bl	R3_Write
+ 265              	.LVL47:
+  96:ZumoLibrary/Reflectance.c ****         L3_SetDriveMode(PIN_DM_STRONG);
+ 266              		.loc 1 96 0
+ 267 0162 0C20     		movs	r0, #12
+ 268 0164 FFF7FEFF 		bl	L3_SetDriveMode
+ 269              	.LVL48:
+  97:ZumoLibrary/Reflectance.c ****         L3_Write(1);
+ 270              		.loc 1 97 0
+ 271 0168 0120     		movs	r0, #1
+ 272 016a FFF7FEFF 		bl	L3_Write
+ 273              	.LVL49:
+  98:ZumoLibrary/Reflectance.c ****         L2_SetDriveMode(PIN_DM_STRONG);
+ 274              		.loc 1 98 0
+ 275 016e 0C20     		movs	r0, #12
+ 276 0170 FFF7FEFF 		bl	L2_SetDriveMode
+ 277              	.LVL50:
+  99:ZumoLibrary/Reflectance.c ****         L2_Write(1);
+ 278              		.loc 1 99 0
+ 279 0174 0120     		movs	r0, #1
+ 280 0176 FFF7FEFF 		bl	L2_Write
+ 281              	.LVL51:
+ 100:ZumoLibrary/Reflectance.c ****         L1_SetDriveMode(PIN_DM_STRONG);
+ 282              		.loc 1 100 0
+ 283 017a 0C20     		movs	r0, #12
+ 284 017c FFF7FEFF 		bl	L1_SetDriveMode
+ 285              	.LVL52:
+ 101:ZumoLibrary/Reflectance.c ****         L1_Write(1);
+ 286              		.loc 1 101 0
+ 287 0180 0120     		movs	r0, #1
+ 288 0182 FFF7FEFF 		bl	L1_Write
+ 289              	.LVL53:
+ 102:ZumoLibrary/Reflectance.c ****         Timer_Reset_Write(0);
+ 290              		.loc 1 102 0
+ 291 0186 0020     		movs	r0, #0
+ 292 0188 FFF7FEFF 		bl	Timer_Reset_Write
+ 293              	.LVL54:
+ 103:ZumoLibrary/Reflectance.c **** 
+ 104:ZumoLibrary/Reflectance.c ****         CyDelayUs(10);
+ 294              		.loc 1 104 0
+ 295 018c 0A20     		movs	r0, #10
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 8
+
+
+ 296 018e FFF7FEFF 		bl	CyDelayUs
+ 297              	.LVL55:
+ 105:ZumoLibrary/Reflectance.c ****         R1_SetDriveMode(PIN_DM_DIG_HIZ);
+ 298              		.loc 1 105 0
+ 299 0192 0220     		movs	r0, #2
+ 300 0194 FFF7FEFF 		bl	R1_SetDriveMode
+ 301              	.LVL56:
+ 106:ZumoLibrary/Reflectance.c ****         R2_SetDriveMode(PIN_DM_DIG_HIZ);
+ 302              		.loc 1 106 0
+ 303 0198 0220     		movs	r0, #2
+ 304 019a FFF7FEFF 		bl	R2_SetDriveMode
+ 305              	.LVL57:
+ 107:ZumoLibrary/Reflectance.c ****         R3_SetDriveMode(PIN_DM_DIG_HIZ);
+ 306              		.loc 1 107 0
+ 307 019e 0220     		movs	r0, #2
+ 308 01a0 FFF7FEFF 		bl	R3_SetDriveMode
+ 309              	.LVL58:
+ 108:ZumoLibrary/Reflectance.c ****         L3_SetDriveMode(PIN_DM_DIG_HIZ);
+ 310              		.loc 1 108 0
+ 311 01a4 0220     		movs	r0, #2
+ 312 01a6 FFF7FEFF 		bl	L3_SetDriveMode
+ 313              	.LVL59:
+ 109:ZumoLibrary/Reflectance.c ****         L2_SetDriveMode(PIN_DM_DIG_HIZ);
+ 314              		.loc 1 109 0
+ 315 01aa 0220     		movs	r0, #2
+ 316 01ac FFF7FEFF 		bl	L2_SetDriveMode
+ 317              	.LVL60:
+ 110:ZumoLibrary/Reflectance.c ****         L1_SetDriveMode(PIN_DM_DIG_HIZ);
+ 318              		.loc 1 110 0
+ 319 01b0 0220     		movs	r0, #2
+ 320 01b2 FFF7FEFF 		bl	L1_SetDriveMode
+ 321              	.LVL61:
+ 111:ZumoLibrary/Reflectance.c ****         vTaskDelayUntil(&prev, 1);
+ 322              		.loc 1 111 0
+ 323 01b6 0121     		movs	r1, #1
+ 324 01b8 01A8     		add	r0, sp, #4
+ 325 01ba FFF7FEFF 		bl	vTaskDelayUntil
+ 326              	.LVL62:
+ 112:ZumoLibrary/Reflectance.c ****     }
+ 327              		.loc 1 112 0
+ 328 01be 25E7     		b	.L14
+ 329              	.L17:
+ 330              		.align	2
+ 331              	.L16:
+ 332 01c0 00000000 		.word	.LANCHOR0
+ 333              		.cfi_endproc
+ 334              	.LFE69:
+ 335              		.size	ReflectanceTask, .-ReflectanceTask
+ 336              		.section	.text.reflectance_start,"ax",%progbits
+ 337              		.align	2
+ 338              		.global	reflectance_start
+ 339              		.thumb
+ 340              		.thumb_func
+ 341              		.type	reflectance_start, %function
+ 342              	reflectance_start:
+ 343              	.LFB70:
+ 113:ZumoLibrary/Reflectance.c **** }
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 9
+
+
+ 114:ZumoLibrary/Reflectance.c **** 
+ 115:ZumoLibrary/Reflectance.c **** 
+ 116:ZumoLibrary/Reflectance.c **** /**
+ 117:ZumoLibrary/Reflectance.c **** * @brief    Starting Reflectance Sensor
+ 118:ZumoLibrary/Reflectance.c **** * @details 
+ 119:ZumoLibrary/Reflectance.c **** */
+ 120:ZumoLibrary/Reflectance.c **** void reflectance_start()
+ 121:ZumoLibrary/Reflectance.c **** {
+ 344              		.loc 1 121 0
+ 345              		.cfi_startproc
+ 346              		@ args = 0, pretend = 0, frame = 0
+ 347              		@ frame_needed = 0, uses_anonymous_args = 0
+ 122:ZumoLibrary/Reflectance.c ****     if(ReflectanceHandle == NULL) {
+ 348              		.loc 1 122 0
+ 349 0000 104B     		ldr	r3, .L22
+ 350 0002 DB68     		ldr	r3, [r3, #12]
+ 351 0004 EBB9     		cbnz	r3, .L21
+ 121:ZumoLibrary/Reflectance.c ****     if(ReflectanceHandle == NULL) {
+ 352              		.loc 1 121 0
+ 353 0006 00B5     		push	{lr}
+ 354              		.cfi_def_cfa_offset 4
+ 355              		.cfi_offset 14, -4
+ 356 0008 83B0     		sub	sp, sp, #12
+ 357              		.cfi_def_cfa_offset 16
+ 123:ZumoLibrary/Reflectance.c ****         Refl_led_Write(1);
+ 358              		.loc 1 123 0
+ 359 000a 0120     		movs	r0, #1
+ 360 000c FFF7FEFF 		bl	Refl_led_Write
+ 361              	.LVL63:
+ 124:ZumoLibrary/Reflectance.c **** 
+ 125:ZumoLibrary/Reflectance.c ****         Timer_R1_Start();
+ 362              		.loc 1 125 0
+ 363 0010 FFF7FEFF 		bl	Timer_R1_Start
+ 364              	.LVL64:
+ 126:ZumoLibrary/Reflectance.c ****         Timer_R2_Start();
+ 365              		.loc 1 126 0
+ 366 0014 FFF7FEFF 		bl	Timer_R2_Start
+ 367              	.LVL65:
+ 127:ZumoLibrary/Reflectance.c ****         Timer_R3_Start();
+ 368              		.loc 1 127 0
+ 369 0018 FFF7FEFF 		bl	Timer_R3_Start
+ 370              	.LVL66:
+ 128:ZumoLibrary/Reflectance.c ****         Timer_L3_Start();
+ 371              		.loc 1 128 0
+ 372 001c FFF7FEFF 		bl	Timer_L3_Start
+ 373              	.LVL67:
+ 129:ZumoLibrary/Reflectance.c ****         Timer_L2_Start();
+ 374              		.loc 1 129 0
+ 375 0020 FFF7FEFF 		bl	Timer_L2_Start
+ 376              	.LVL68:
+ 130:ZumoLibrary/Reflectance.c ****         Timer_L1_Start();
+ 377              		.loc 1 130 0
+ 378 0024 FFF7FEFF 		bl	Timer_L1_Start
+ 379              	.LVL69:
+ 131:ZumoLibrary/Reflectance.c ****         // task runs at highest priority and wakes up every millisecond but uses very little CPU ti
+ 132:ZumoLibrary/Reflectance.c ****         xTaskCreate( ReflectanceTask, "Reflectance", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORI
+ 380              		.loc 1 132 0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 10
+
+
+ 381 0028 074B     		ldr	r3, .L22+4
+ 382 002a 0193     		str	r3, [sp, #4]
+ 383 002c 0323     		movs	r3, #3
+ 384 002e 0093     		str	r3, [sp]
+ 385 0030 0023     		movs	r3, #0
+ 386 0032 6422     		movs	r2, #100
+ 387 0034 0549     		ldr	r1, .L22+8
+ 388 0036 0648     		ldr	r0, .L22+12
+ 389 0038 FFF7FEFF 		bl	xTaskCreate
+ 390              	.LVL70:
+ 133:ZumoLibrary/Reflectance.c ****     }
+ 134:ZumoLibrary/Reflectance.c **** }
+ 391              		.loc 1 134 0
+ 392 003c 03B0     		add	sp, sp, #12
+ 393              		.cfi_def_cfa_offset 4
+ 394              		@ sp needed
+ 395 003e 5DF804FB 		ldr	pc, [sp], #4
+ 396              	.L21:
+ 397              		.cfi_def_cfa_offset 0
+ 398              		.cfi_restore 14
+ 399 0042 7047     		bx	lr
+ 400              	.L23:
+ 401              		.align	2
+ 402              	.L22:
+ 403 0044 00000000 		.word	.LANCHOR0
+ 404 0048 0C000000 		.word	.LANCHOR0+12
+ 405 004c 00000000 		.word	.LC0
+ 406 0050 00000000 		.word	ReflectanceTask
+ 407              		.cfi_endproc
+ 408              	.LFE70:
+ 409              		.size	reflectance_start, .-reflectance_start
+ 410              		.section	.text.reflectance_read,"ax",%progbits
+ 411              		.align	2
+ 412              		.global	reflectance_read
+ 413              		.thumb
+ 414              		.thumb_func
+ 415              		.type	reflectance_read, %function
+ 416              	reflectance_read:
+ 417              	.LFB71:
+ 135:ZumoLibrary/Reflectance.c **** 
+ 136:ZumoLibrary/Reflectance.c **** 
+ 137:ZumoLibrary/Reflectance.c **** /**
+ 138:ZumoLibrary/Reflectance.c **** * @brief    Read reflectance sensor values
+ 139:ZumoLibrary/Reflectance.c **** * @details
+ 140:ZumoLibrary/Reflectance.c **** */
+ 141:ZumoLibrary/Reflectance.c **** void reflectance_read(struct sensors_ *values)
+ 142:ZumoLibrary/Reflectance.c **** {
+ 418              		.loc 1 142 0
+ 419              		.cfi_startproc
+ 420              		@ args = 0, pretend = 0, frame = 0
+ 421              		@ frame_needed = 0, uses_anonymous_args = 0
+ 422              		@ link register save eliminated.
+ 423              	.LVL71:
+ 424 0000 10B4     		push	{r4}
+ 425              		.cfi_def_cfa_offset 4
+ 426              		.cfi_offset 4, -4
+ 427 0002 0446     		mov	r4, r0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 11
+
+
+ 143:ZumoLibrary/Reflectance.c ****     *values = sensors;
+ 428              		.loc 1 143 0
+ 429 0004 034B     		ldr	r3, .L26
+ 430 0006 07CB     		ldmia	r3!, {r0, r1, r2}
+ 431              	.LVL72:
+ 432 0008 2060     		str	r0, [r4]	@ unaligned
+ 433 000a 6160     		str	r1, [r4, #4]	@ unaligned
+ 434 000c A260     		str	r2, [r4, #8]	@ unaligned
+ 144:ZumoLibrary/Reflectance.c **** }
+ 435              		.loc 1 144 0
+ 436 000e 10BC     		pop	{r4}
+ 437              		.cfi_restore 4
+ 438              		.cfi_def_cfa_offset 0
+ 439              	.LVL73:
+ 440 0010 7047     		bx	lr
+ 441              	.L27:
+ 442 0012 00BF     		.align	2
+ 443              	.L26:
+ 444 0014 00000000 		.word	.LANCHOR0
+ 445              		.cfi_endproc
+ 446              	.LFE71:
+ 447              		.size	reflectance_read, .-reflectance_read
+ 448              		.section	.text.reflectance_digital,"ax",%progbits
+ 449              		.align	2
+ 450              		.global	reflectance_digital
+ 451              		.thumb
+ 452              		.thumb_func
+ 453              		.type	reflectance_digital, %function
+ 454              	reflectance_digital:
+ 455              	.LFB72:
+ 145:ZumoLibrary/Reflectance.c **** 
+ 146:ZumoLibrary/Reflectance.c **** 
+ 147:ZumoLibrary/Reflectance.c **** /**
+ 148:ZumoLibrary/Reflectance.c **** * @brief    Making Reflectance Sensor's period to digital
+ 149:ZumoLibrary/Reflectance.c **** * @details
+ 150:ZumoLibrary/Reflectance.c **** */
+ 151:ZumoLibrary/Reflectance.c **** void reflectance_digital(struct sensors_ *digital)
+ 152:ZumoLibrary/Reflectance.c **** {
+ 456              		.loc 1 152 0
+ 457              		.cfi_startproc
+ 458              		@ args = 0, pretend = 0, frame = 0
+ 459              		@ frame_needed = 0, uses_anonymous_args = 0
+ 460              		@ link register save eliminated.
+ 461              	.LVL74:
+ 153:ZumoLibrary/Reflectance.c ****     //if the results of reflectance_period function is over threshold, set digital_sensor_value to 
+ 154:ZumoLibrary/Reflectance.c ****     if(sensors.l3 < threshold.l3)
+ 462              		.loc 1 154 0
+ 463 0000 244B     		ldr	r3, .L41
+ 464 0002 1B88     		ldrh	r3, [r3]
+ 465 0004 9BB2     		uxth	r3, r3
+ 466 0006 244A     		ldr	r2, .L41+4
+ 467 0008 1288     		ldrh	r2, [r2]
+ 468 000a 9342     		cmp	r3, r2
+ 469 000c 02D2     		bcs	.L29
+ 155:ZumoLibrary/Reflectance.c ****         digital->l3 = 0;
+ 470              		.loc 1 155 0
+ 471 000e 0023     		movs	r3, #0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 12
+
+
+ 472 0010 0380     		strh	r3, [r0]	@ movhi
+ 473 0012 01E0     		b	.L30
+ 474              	.L29:
+ 156:ZumoLibrary/Reflectance.c ****     else
+ 157:ZumoLibrary/Reflectance.c ****         digital->l3 = 1;
+ 475              		.loc 1 157 0
+ 476 0014 0123     		movs	r3, #1
+ 477 0016 0380     		strh	r3, [r0]	@ movhi
+ 478              	.L30:
+ 158:ZumoLibrary/Reflectance.c ****     
+ 159:ZumoLibrary/Reflectance.c ****     if(sensors.l2 < threshold.l2)
+ 479              		.loc 1 159 0
+ 480 0018 1E4B     		ldr	r3, .L41
+ 481 001a 5B88     		ldrh	r3, [r3, #2]
+ 482 001c 9BB2     		uxth	r3, r3
+ 483 001e 1E4A     		ldr	r2, .L41+4
+ 484 0020 5288     		ldrh	r2, [r2, #2]
+ 485 0022 9342     		cmp	r3, r2
+ 486 0024 02D2     		bcs	.L31
+ 160:ZumoLibrary/Reflectance.c ****         digital->l2 = 0;
+ 487              		.loc 1 160 0
+ 488 0026 0023     		movs	r3, #0
+ 489 0028 4380     		strh	r3, [r0, #2]	@ movhi
+ 490 002a 01E0     		b	.L32
+ 491              	.L31:
+ 161:ZumoLibrary/Reflectance.c ****     else
+ 162:ZumoLibrary/Reflectance.c ****         digital->l2 = 1;
+ 492              		.loc 1 162 0
+ 493 002c 0123     		movs	r3, #1
+ 494 002e 4380     		strh	r3, [r0, #2]	@ movhi
+ 495              	.L32:
+ 163:ZumoLibrary/Reflectance.c ****     
+ 164:ZumoLibrary/Reflectance.c ****     if(sensors.l1 < threshold.l1)
+ 496              		.loc 1 164 0
+ 497 0030 184B     		ldr	r3, .L41
+ 498 0032 9B88     		ldrh	r3, [r3, #4]
+ 499 0034 9BB2     		uxth	r3, r3
+ 500 0036 184A     		ldr	r2, .L41+4
+ 501 0038 9288     		ldrh	r2, [r2, #4]
+ 502 003a 9342     		cmp	r3, r2
+ 503 003c 02D2     		bcs	.L33
+ 165:ZumoLibrary/Reflectance.c ****         digital->l1 = 0;
+ 504              		.loc 1 165 0
+ 505 003e 0023     		movs	r3, #0
+ 506 0040 8380     		strh	r3, [r0, #4]	@ movhi
+ 507 0042 01E0     		b	.L34
+ 508              	.L33:
+ 166:ZumoLibrary/Reflectance.c ****     else
+ 167:ZumoLibrary/Reflectance.c ****         digital->l1 = 1;
+ 509              		.loc 1 167 0
+ 510 0044 0123     		movs	r3, #1
+ 511 0046 8380     		strh	r3, [r0, #4]	@ movhi
+ 512              	.L34:
+ 168:ZumoLibrary/Reflectance.c ****     
+ 169:ZumoLibrary/Reflectance.c ****     if(sensors.r1 < threshold.r1)
+ 513              		.loc 1 169 0
+ 514 0048 124B     		ldr	r3, .L41
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 13
+
+
+ 515 004a DB88     		ldrh	r3, [r3, #6]
+ 516 004c 9BB2     		uxth	r3, r3
+ 517 004e 124A     		ldr	r2, .L41+4
+ 518 0050 D288     		ldrh	r2, [r2, #6]
+ 519 0052 9342     		cmp	r3, r2
+ 520 0054 02D2     		bcs	.L35
+ 170:ZumoLibrary/Reflectance.c ****         digital->r1 = 0;
+ 521              		.loc 1 170 0
+ 522 0056 0023     		movs	r3, #0
+ 523 0058 C380     		strh	r3, [r0, #6]	@ movhi
+ 524 005a 01E0     		b	.L36
+ 525              	.L35:
+ 171:ZumoLibrary/Reflectance.c ****     else
+ 172:ZumoLibrary/Reflectance.c ****         digital->r1 = 1;
+ 526              		.loc 1 172 0
+ 527 005c 0123     		movs	r3, #1
+ 528 005e C380     		strh	r3, [r0, #6]	@ movhi
+ 529              	.L36:
+ 173:ZumoLibrary/Reflectance.c ****     
+ 174:ZumoLibrary/Reflectance.c ****     if(sensors.r2 < threshold.r2)
+ 530              		.loc 1 174 0
+ 531 0060 0C4B     		ldr	r3, .L41
+ 532 0062 1B89     		ldrh	r3, [r3, #8]
+ 533 0064 9BB2     		uxth	r3, r3
+ 534 0066 0C4A     		ldr	r2, .L41+4
+ 535 0068 1289     		ldrh	r2, [r2, #8]
+ 536 006a 9342     		cmp	r3, r2
+ 537 006c 02D2     		bcs	.L37
+ 175:ZumoLibrary/Reflectance.c ****         digital->r2 = 0;
+ 538              		.loc 1 175 0
+ 539 006e 0023     		movs	r3, #0
+ 540 0070 0381     		strh	r3, [r0, #8]	@ movhi
+ 541 0072 01E0     		b	.L38
+ 542              	.L37:
+ 176:ZumoLibrary/Reflectance.c ****     else
+ 177:ZumoLibrary/Reflectance.c ****         digital->r2 = 1;
+ 543              		.loc 1 177 0
+ 544 0074 0123     		movs	r3, #1
+ 545 0076 0381     		strh	r3, [r0, #8]	@ movhi
+ 546              	.L38:
+ 178:ZumoLibrary/Reflectance.c ****     
+ 179:ZumoLibrary/Reflectance.c ****     if(sensors.r3 < threshold.r3)
+ 547              		.loc 1 179 0
+ 548 0078 064B     		ldr	r3, .L41
+ 549 007a 5B89     		ldrh	r3, [r3, #10]
+ 550 007c 9BB2     		uxth	r3, r3
+ 551 007e 064A     		ldr	r2, .L41+4
+ 552 0080 5289     		ldrh	r2, [r2, #10]
+ 553 0082 9342     		cmp	r3, r2
+ 554 0084 02D2     		bcs	.L39
+ 180:ZumoLibrary/Reflectance.c ****         digital->r3 = 0;
+ 555              		.loc 1 180 0
+ 556 0086 0023     		movs	r3, #0
+ 557 0088 4381     		strh	r3, [r0, #10]	@ movhi
+ 558 008a 7047     		bx	lr
+ 559              	.L39:
+ 181:ZumoLibrary/Reflectance.c ****     else
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 14
+
+
+ 182:ZumoLibrary/Reflectance.c ****         digital->r3 = 1;
+ 560              		.loc 1 182 0
+ 561 008c 0123     		movs	r3, #1
+ 562 008e 4381     		strh	r3, [r0, #10]	@ movhi
+ 563 0090 7047     		bx	lr
+ 564              	.L42:
+ 565 0092 00BF     		.align	2
+ 566              	.L41:
+ 567 0094 00000000 		.word	.LANCHOR0
+ 568 0098 00000000 		.word	.LANCHOR1
+ 569              		.cfi_endproc
+ 570              	.LFE72:
+ 571              		.size	reflectance_digital, .-reflectance_digital
+ 572              		.section	.text.reflectance_set_threshold,"ax",%progbits
+ 573              		.align	2
+ 574              		.global	reflectance_set_threshold
+ 575              		.thumb
+ 576              		.thumb_func
+ 577              		.type	reflectance_set_threshold, %function
+ 578              	reflectance_set_threshold:
+ 579              	.LFB73:
+ 183:ZumoLibrary/Reflectance.c ****         
+ 184:ZumoLibrary/Reflectance.c **** }
+ 185:ZumoLibrary/Reflectance.c **** 
+ 186:ZumoLibrary/Reflectance.c **** void reflectance_set_threshold(uint16_t l3, uint16_t l2, uint16_t l1, uint16_t r1, uint16_t r2, uin
+ 187:ZumoLibrary/Reflectance.c **** {
+ 580              		.loc 1 187 0
+ 581              		.cfi_startproc
+ 582              		@ args = 8, pretend = 0, frame = 0
+ 583              		@ frame_needed = 0, uses_anonymous_args = 0
+ 584              		@ link register save eliminated.
+ 585              	.LVL75:
+ 586 0000 10B4     		push	{r4}
+ 587              		.cfi_def_cfa_offset 4
+ 588              		.cfi_offset 4, -4
+ 188:ZumoLibrary/Reflectance.c ****     threshold.l3 = l3;
+ 589              		.loc 1 188 0
+ 590 0002 064C     		ldr	r4, .L45
+ 591 0004 2080     		strh	r0, [r4]	@ movhi
+ 189:ZumoLibrary/Reflectance.c ****     threshold.l2 = l2;
+ 592              		.loc 1 189 0
+ 593 0006 6180     		strh	r1, [r4, #2]	@ movhi
+ 190:ZumoLibrary/Reflectance.c ****     threshold.l1 = l1;
+ 594              		.loc 1 190 0
+ 595 0008 A280     		strh	r2, [r4, #4]	@ movhi
+ 191:ZumoLibrary/Reflectance.c ****     threshold.r3 = r3;
+ 596              		.loc 1 191 0
+ 597 000a BDF80820 		ldrh	r2, [sp, #8]
+ 598              	.LVL76:
+ 599 000e 6281     		strh	r2, [r4, #10]	@ movhi
+ 192:ZumoLibrary/Reflectance.c ****     threshold.r2 = r2;
+ 600              		.loc 1 192 0
+ 601 0010 BDF80420 		ldrh	r2, [sp, #4]
+ 602 0014 2281     		strh	r2, [r4, #8]	@ movhi
+ 193:ZumoLibrary/Reflectance.c ****     threshold.r1 = r1;
+ 603              		.loc 1 193 0
+ 604 0016 E380     		strh	r3, [r4, #6]	@ movhi
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 15
+
+
+ 194:ZumoLibrary/Reflectance.c **** }
+ 605              		.loc 1 194 0
+ 606 0018 10BC     		pop	{r4}
+ 607              		.cfi_restore 4
+ 608              		.cfi_def_cfa_offset 0
+ 609              	.LVL77:
+ 610 001a 7047     		bx	lr
+ 611              	.L46:
+ 612              		.align	2
+ 613              	.L45:
+ 614 001c 00000000 		.word	.LANCHOR1
+ 615              		.cfi_endproc
+ 616              	.LFE73:
+ 617              		.size	reflectance_set_threshold, .-reflectance_set_threshold
+ 618              		.data
+ 619              		.align	2
+ 620              		.set	.LANCHOR1,. + 0
+ 621              		.type	threshold, %object
+ 622              		.size	threshold, 12
+ 623              	threshold:
+ 624 0000 1027     		.short	10000
+ 625 0002 1027     		.short	10000
+ 626 0004 1027     		.short	10000
+ 627 0006 1027     		.short	10000
+ 628 0008 1027     		.short	10000
+ 629 000a 1027     		.short	10000
+ 630              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 631              		.align	2
+ 632              	.LC0:
+ 633 0000 5265666C 		.ascii	"Reflectance\000"
+ 633      65637461 
+ 633      6E636500 
+ 634              		.bss
+ 635              		.align	2
+ 636              		.set	.LANCHOR0,. + 0
+ 637              		.type	sensors, %object
+ 638              		.size	sensors, 12
+ 639              	sensors:
+ 640 0000 00000000 		.space	12
+ 640      00000000 
+ 640      00000000 
+ 641              		.type	ReflectanceHandle, %object
+ 642              		.size	ReflectanceHandle, 4
+ 643              	ReflectanceHandle:
+ 644 000c 00000000 		.space	4
+ 645              		.type	digital_sensor_value, %object
+ 646              		.size	digital_sensor_value, 12
+ 647              	digital_sensor_value:
+ 648 0010 00000000 		.space	12
+ 648      00000000 
+ 648      00000000 
+ 649              		.text
+ 650              	.Letext0:
+ 651              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 652              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 653              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 654              		.file 5 "..\\FreeRTOS\\Source\\portable\\GCC\\ARM_CM3/portmacro.h"
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 16
+
+
+ 655              		.file 6 "..\\FreeRTOS\\Source\\include/task.h"
+ 656              		.file 7 "ZumoLibrary\\Reflectance.h"
+ 657              		.file 8 "Generated_Source\\PSoC5/Timer_R1.h"
+ 658              		.file 9 "Generated_Source\\PSoC5/Timer_R2.h"
+ 659              		.file 10 "Generated_Source\\PSoC5/Timer_R3.h"
+ 660              		.file 11 "Generated_Source\\PSoC5/Timer_L3.h"
+ 661              		.file 12 "Generated_Source\\PSoC5/Timer_L2.h"
+ 662              		.file 13 "Generated_Source\\PSoC5/Timer_L1.h"
+ 663              		.file 14 "Generated_Source\\PSoC5/Timer_Reset.h"
+ 664              		.file 15 "Generated_Source\\PSoC5/R1.h"
+ 665              		.file 16 "Generated_Source\\PSoC5/R2.h"
+ 666              		.file 17 "Generated_Source\\PSoC5/R3.h"
+ 667              		.file 18 "Generated_Source\\PSoC5/L3.h"
+ 668              		.file 19 "Generated_Source\\PSoC5/L2.h"
+ 669              		.file 20 "Generated_Source\\PSoC5/L1.h"
+ 670              		.file 21 "Generated_Source\\PSoC5/CyLib.h"
+ 671              		.file 22 "Generated_Source\\PSoC5/Refl_led.h"
+ 672              		.file 23 "Generated_Source\\PSoC5/core_cm3.h"
+ 673              		.section	.debug_info,"",%progbits
+ 674              	.Ldebug_info0:
+ 675 0000 57080000 		.4byte	0x857
+ 676 0004 0400     		.2byte	0x4
+ 677 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 678 000a 04       		.byte	0x4
+ 679 000b 01       		.uleb128 0x1
+ 680 000c 7E030000 		.4byte	.LASF90
+ 681 0010 0C       		.byte	0xc
+ 682 0011 07060000 		.4byte	.LASF91
+ 683 0015 E1040000 		.4byte	.LASF92
+ 684 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 685 001d 00000000 		.4byte	0
+ 686 0021 00000000 		.4byte	.Ldebug_line0
+ 687 0025 02       		.uleb128 0x2
+ 688 0026 01       		.byte	0x1
+ 689 0027 06       		.byte	0x6
+ 690 0028 EF020000 		.4byte	.LASF0
+ 691 002c 02       		.uleb128 0x2
+ 692 002d 01       		.byte	0x1
+ 693 002e 08       		.byte	0x8
+ 694 002f 67020000 		.4byte	.LASF1
+ 695 0033 02       		.uleb128 0x2
+ 696 0034 02       		.byte	0x2
+ 697 0035 05       		.byte	0x5
+ 698 0036 62000000 		.4byte	.LASF2
+ 699 003a 03       		.uleb128 0x3
+ 700 003b E1000000 		.4byte	.LASF4
+ 701 003f 02       		.byte	0x2
+ 702 0040 2B       		.byte	0x2b
+ 703 0041 45000000 		.4byte	0x45
+ 704 0045 02       		.uleb128 0x2
+ 705 0046 02       		.byte	0x2
+ 706 0047 07       		.byte	0x7
+ 707 0048 6B030000 		.4byte	.LASF3
+ 708 004c 03       		.uleb128 0x3
+ 709 004d 7A050000 		.4byte	.LASF5
+ 710 0051 02       		.byte	0x2
+ 711 0052 3F       		.byte	0x3f
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 17
+
+
+ 712 0053 57000000 		.4byte	0x57
+ 713 0057 02       		.uleb128 0x2
+ 714 0058 04       		.byte	0x4
+ 715 0059 05       		.byte	0x5
+ 716 005a 36020000 		.4byte	.LASF6
+ 717 005e 03       		.uleb128 0x3
+ 718 005f B6000000 		.4byte	.LASF7
+ 719 0063 02       		.byte	0x2
+ 720 0064 41       		.byte	0x41
+ 721 0065 69000000 		.4byte	0x69
+ 722 0069 02       		.uleb128 0x2
+ 723 006a 04       		.byte	0x4
+ 724 006b 07       		.byte	0x7
+ 725 006c CF040000 		.4byte	.LASF8
+ 726 0070 02       		.uleb128 0x2
+ 727 0071 08       		.byte	0x8
+ 728 0072 05       		.byte	0x5
+ 729 0073 A8000000 		.4byte	.LASF9
+ 730 0077 02       		.uleb128 0x2
+ 731 0078 08       		.byte	0x8
+ 732 0079 07       		.byte	0x7
+ 733 007a FB020000 		.4byte	.LASF10
+ 734 007e 04       		.uleb128 0x4
+ 735 007f 04       		.byte	0x4
+ 736 0080 05       		.byte	0x5
+ 737 0081 696E7400 		.ascii	"int\000"
+ 738 0085 02       		.uleb128 0x2
+ 739 0086 04       		.byte	0x4
+ 740 0087 07       		.byte	0x7
+ 741 0088 3F030000 		.4byte	.LASF11
+ 742 008c 02       		.uleb128 0x2
+ 743 008d 08       		.byte	0x8
+ 744 008e 04       		.byte	0x4
+ 745 008f 9A020000 		.4byte	.LASF12
+ 746 0093 05       		.uleb128 0x5
+ 747 0094 04       		.byte	0x4
+ 748 0095 02       		.uleb128 0x2
+ 749 0096 04       		.byte	0x4
+ 750 0097 07       		.byte	0x7
+ 751 0098 75000000 		.4byte	.LASF13
+ 752 009c 02       		.uleb128 0x2
+ 753 009d 01       		.byte	0x1
+ 754 009e 08       		.byte	0x8
+ 755 009f 1D020000 		.4byte	.LASF14
+ 756 00a3 03       		.uleb128 0x3
+ 757 00a4 4C030000 		.4byte	.LASF15
+ 758 00a8 03       		.byte	0x3
+ 759 00a9 24       		.byte	0x24
+ 760 00aa 3A000000 		.4byte	0x3a
+ 761 00ae 03       		.uleb128 0x3
+ 762 00af 51040000 		.4byte	.LASF16
+ 763 00b3 03       		.byte	0x3
+ 764 00b4 2C       		.byte	0x2c
+ 765 00b5 4C000000 		.4byte	0x4c
+ 766 00b9 03       		.uleb128 0x3
+ 767 00ba 21030000 		.4byte	.LASF17
+ 768 00be 03       		.byte	0x3
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 18
+
+
+ 769 00bf 30       		.byte	0x30
+ 770 00c0 5E000000 		.4byte	0x5e
+ 771 00c4 06       		.uleb128 0x6
+ 772 00c5 B5050000 		.4byte	.LASF18
+ 773 00c9 04       		.byte	0x4
+ 774 00ca E401     		.2byte	0x1e4
+ 775 00cc 2C000000 		.4byte	0x2c
+ 776 00d0 02       		.uleb128 0x2
+ 777 00d1 04       		.byte	0x4
+ 778 00d2 04       		.byte	0x4
+ 779 00d3 A9010000 		.4byte	.LASF19
+ 780 00d7 02       		.uleb128 0x2
+ 781 00d8 08       		.byte	0x8
+ 782 00d9 04       		.byte	0x4
+ 783 00da 09000000 		.4byte	.LASF20
+ 784 00de 03       		.uleb128 0x3
+ 785 00df 59040000 		.4byte	.LASF21
+ 786 00e3 05       		.byte	0x5
+ 787 00e4 39       		.byte	0x39
+ 788 00e5 69000000 		.4byte	0x69
+ 789 00e9 03       		.uleb128 0x3
+ 790 00ea DF010000 		.4byte	.LASF22
+ 791 00ee 05       		.byte	0x5
+ 792 00ef 3F       		.byte	0x3f
+ 793 00f0 B9000000 		.4byte	0xb9
+ 794 00f4 03       		.uleb128 0x3
+ 795 00f5 93000000 		.4byte	.LASF23
+ 796 00f9 06       		.byte	0x6
+ 797 00fa 3D       		.byte	0x3d
+ 798 00fb 93000000 		.4byte	0x93
+ 799 00ff 07       		.uleb128 0x7
+ 800 0100 A9040000 		.4byte	.LASF93
+ 801 0104 0C       		.byte	0xc
+ 802 0105 07       		.byte	0x7
+ 803 0106 0E       		.byte	0xe
+ 804 0107 4E010000 		.4byte	0x14e
+ 805 010b 08       		.uleb128 0x8
+ 806 010c 6C3300   		.ascii	"l3\000"
+ 807 010f 07       		.byte	0x7
+ 808 0110 0F       		.byte	0xf
+ 809 0111 A3000000 		.4byte	0xa3
+ 810 0115 00       		.byte	0
+ 811 0116 08       		.uleb128 0x8
+ 812 0117 6C3200   		.ascii	"l2\000"
+ 813 011a 07       		.byte	0x7
+ 814 011b 10       		.byte	0x10
+ 815 011c A3000000 		.4byte	0xa3
+ 816 0120 02       		.byte	0x2
+ 817 0121 08       		.uleb128 0x8
+ 818 0122 6C3100   		.ascii	"l1\000"
+ 819 0125 07       		.byte	0x7
+ 820 0126 11       		.byte	0x11
+ 821 0127 A3000000 		.4byte	0xa3
+ 822 012b 04       		.byte	0x4
+ 823 012c 08       		.uleb128 0x8
+ 824 012d 723100   		.ascii	"r1\000"
+ 825 0130 07       		.byte	0x7
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 19
+
+
+ 826 0131 12       		.byte	0x12
+ 827 0132 A3000000 		.4byte	0xa3
+ 828 0136 06       		.byte	0x6
+ 829 0137 08       		.uleb128 0x8
+ 830 0138 723200   		.ascii	"r2\000"
+ 831 013b 07       		.byte	0x7
+ 832 013c 13       		.byte	0x13
+ 833 013d A3000000 		.4byte	0xa3
+ 834 0141 08       		.byte	0x8
+ 835 0142 08       		.uleb128 0x8
+ 836 0143 723300   		.ascii	"r3\000"
+ 837 0146 07       		.byte	0x7
+ 838 0147 14       		.byte	0x14
+ 839 0148 A3000000 		.4byte	0xa3
+ 840 014c 0A       		.byte	0xa
+ 841 014d 00       		.byte	0
+ 842 014e 09       		.uleb128 0x9
+ 843 014f C1000000 		.4byte	.LASF94
+ 844 0153 01       		.byte	0x1
+ 845 0154 17       		.byte	0x17
+ 846 0155 00000000 		.4byte	.LFB69
+ 847 0159 C4010000 		.4byte	.LFE69-.LFB69
+ 848 015d 01       		.uleb128 0x1
+ 849 015e 9C       		.byte	0x9c
+ 850 015f A5040000 		.4byte	0x4a5
+ 851 0163 0A       		.uleb128 0xa
+ 852 0164 5E030000 		.4byte	.LASF33
+ 853 0168 01       		.byte	0x1
+ 854 0169 17       		.byte	0x17
+ 855 016a 93000000 		.4byte	0x93
+ 856 016e 00000000 		.4byte	.LLST0
+ 857 0172 0B       		.uleb128 0xb
+ 858 0173 E6050000 		.4byte	.LASF24
+ 859 0177 01       		.byte	0x1
+ 860 0178 1B       		.byte	0x1b
+ 861 0179 E9000000 		.4byte	0xe9
+ 862 017d 02       		.uleb128 0x2
+ 863 017e 91       		.byte	0x91
+ 864 017f 5C       		.sleb128 -36
+ 865 0180 0C       		.uleb128 0xc
+ 866 0181 2F010000 		.4byte	.LASF25
+ 867 0185 01       		.byte	0x1
+ 868 0186 1C       		.byte	0x1c
+ 869 0187 B9000000 		.4byte	0xb9
+ 870 018b 21000000 		.4byte	.LLST1
+ 871 018f 0B       		.uleb128 0xb
+ 872 0190 38010000 		.4byte	.LASF26
+ 873 0194 01       		.byte	0x1
+ 874 0195 1D       		.byte	0x1d
+ 875 0196 B9000000 		.4byte	0xb9
+ 876 019a 06       		.uleb128 0x6
+ 877 019b 78       		.byte	0x78
+ 878 019c 00       		.sleb128 0
+ 879 019d 08       		.byte	0x8
+ 880 019e FF       		.byte	0xff
+ 881 019f 1A       		.byte	0x1a
+ 882 01a0 9F       		.byte	0x9f
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 20
+
+
+ 883 01a1 0B       		.uleb128 0xb
+ 884 01a2 00000000 		.4byte	.LASF27
+ 885 01a6 01       		.byte	0x1
+ 886 01a7 1E       		.byte	0x1e
+ 887 01a8 B9000000 		.4byte	0xb9
+ 888 01ac 06       		.uleb128 0x6
+ 889 01ad 76       		.byte	0x76
+ 890 01ae 00       		.sleb128 0
+ 891 01af 08       		.byte	0x8
+ 892 01b0 FF       		.byte	0xff
+ 893 01b1 1A       		.byte	0x1a
+ 894 01b2 9F       		.byte	0x9f
+ 895 01b3 0B       		.uleb128 0xb
+ 896 01b4 48040000 		.4byte	.LASF28
+ 897 01b8 01       		.byte	0x1
+ 898 01b9 1F       		.byte	0x1f
+ 899 01ba B9000000 		.4byte	0xb9
+ 900 01be 06       		.uleb128 0x6
+ 901 01bf 75       		.byte	0x75
+ 902 01c0 00       		.sleb128 0
+ 903 01c1 08       		.byte	0x8
+ 904 01c2 FF       		.byte	0xff
+ 905 01c3 1A       		.byte	0x1a
+ 906 01c4 9F       		.byte	0x9f
+ 907 01c5 0B       		.uleb128 0xb
+ 908 01c6 3F040000 		.4byte	.LASF29
+ 909 01ca 01       		.byte	0x1
+ 910 01cb 20       		.byte	0x20
+ 911 01cc B9000000 		.4byte	0xb9
+ 912 01d0 06       		.uleb128 0x6
+ 913 01d1 77       		.byte	0x77
+ 914 01d2 00       		.sleb128 0
+ 915 01d3 08       		.byte	0x8
+ 916 01d4 FF       		.byte	0xff
+ 917 01d5 1A       		.byte	0x1a
+ 918 01d6 9F       		.byte	0x9f
+ 919 01d7 0B       		.uleb128 0xb
+ 920 01d8 BB050000 		.4byte	.LASF30
+ 921 01dc 01       		.byte	0x1
+ 922 01dd 21       		.byte	0x21
+ 923 01de B9000000 		.4byte	0xb9
+ 924 01e2 06       		.uleb128 0x6
+ 925 01e3 79       		.byte	0x79
+ 926 01e4 00       		.sleb128 0
+ 927 01e5 08       		.byte	0x8
+ 928 01e6 FF       		.byte	0xff
+ 929 01e7 1A       		.byte	0x1a
+ 930 01e8 9F       		.byte	0x9f
+ 931 01e9 0D       		.uleb128 0xd
+ 932 01ea 0A000000 		.4byte	.LVL1
+ 933 01ee 47060000 		.4byte	0x647
+ 934 01f2 0D       		.uleb128 0xd
+ 935 01f3 10000000 		.4byte	.LVL2
+ 936 01f7 53060000 		.4byte	0x653
+ 937 01fb 0D       		.uleb128 0xd
+ 938 01fc 16000000 		.4byte	.LVL4
+ 939 0200 5E060000 		.4byte	0x65e
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 21
+
+
+ 940 0204 0D       		.uleb128 0xd
+ 941 0205 1C000000 		.4byte	.LVL6
+ 942 0209 69060000 		.4byte	0x669
+ 943 020d 0D       		.uleb128 0xd
+ 944 020e 22000000 		.4byte	.LVL8
+ 945 0212 74060000 		.4byte	0x674
+ 946 0216 0D       		.uleb128 0xd
+ 947 0217 28000000 		.4byte	.LVL10
+ 948 021b 7F060000 		.4byte	0x67f
+ 949 021f 0D       		.uleb128 0xd
+ 950 0220 2E000000 		.4byte	.LVL12
+ 951 0224 8A060000 		.4byte	0x68a
+ 952 0228 0D       		.uleb128 0xd
+ 953 0229 3A000000 		.4byte	.LVL14
+ 954 022d 95060000 		.4byte	0x695
+ 955 0231 0D       		.uleb128 0xd
+ 956 0232 40000000 		.4byte	.LVL16
+ 957 0236 A0060000 		.4byte	0x6a0
+ 958 023a 0D       		.uleb128 0xd
+ 959 023b 4E000000 		.4byte	.LVL18
+ 960 023f 95060000 		.4byte	0x695
+ 961 0243 0D       		.uleb128 0xd
+ 962 0244 54000000 		.4byte	.LVL20
+ 963 0248 AB060000 		.4byte	0x6ab
+ 964 024c 0D       		.uleb128 0xd
+ 965 024d 66000000 		.4byte	.LVL21
+ 966 0251 B6060000 		.4byte	0x6b6
+ 967 0255 0D       		.uleb128 0xd
+ 968 0256 6C000000 		.4byte	.LVL22
+ 969 025a C1060000 		.4byte	0x6c1
+ 970 025e 0D       		.uleb128 0xd
+ 971 025f 7A000000 		.4byte	.LVL23
+ 972 0263 B6060000 		.4byte	0x6b6
+ 973 0267 0D       		.uleb128 0xd
+ 974 0268 80000000 		.4byte	.LVL24
+ 975 026c CC060000 		.4byte	0x6cc
+ 976 0270 0D       		.uleb128 0xd
+ 977 0271 92000000 		.4byte	.LVL25
+ 978 0275 D7060000 		.4byte	0x6d7
+ 979 0279 0D       		.uleb128 0xd
+ 980 027a 98000000 		.4byte	.LVL26
+ 981 027e E2060000 		.4byte	0x6e2
+ 982 0282 0D       		.uleb128 0xd
+ 983 0283 A6000000 		.4byte	.LVL27
+ 984 0287 D7060000 		.4byte	0x6d7
+ 985 028b 0D       		.uleb128 0xd
+ 986 028c AC000000 		.4byte	.LVL28
+ 987 0290 ED060000 		.4byte	0x6ed
+ 988 0294 0D       		.uleb128 0xd
+ 989 0295 BE000000 		.4byte	.LVL29
+ 990 0299 F8060000 		.4byte	0x6f8
+ 991 029d 0D       		.uleb128 0xd
+ 992 029e C4000000 		.4byte	.LVL30
+ 993 02a2 03070000 		.4byte	0x703
+ 994 02a6 0D       		.uleb128 0xd
+ 995 02a7 D2000000 		.4byte	.LVL31
+ 996 02ab F8060000 		.4byte	0x6f8
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 22
+
+
+ 997 02af 0D       		.uleb128 0xd
+ 998 02b0 D8000000 		.4byte	.LVL32
+ 999 02b4 0E070000 		.4byte	0x70e
+ 1000 02b8 0D       		.uleb128 0xd
+ 1001 02b9 EA000000 		.4byte	.LVL33
+ 1002 02bd 19070000 		.4byte	0x719
+ 1003 02c1 0D       		.uleb128 0xd
+ 1004 02c2 F0000000 		.4byte	.LVL34
+ 1005 02c6 24070000 		.4byte	0x724
+ 1006 02ca 0D       		.uleb128 0xd
+ 1007 02cb FE000000 		.4byte	.LVL35
+ 1008 02cf 19070000 		.4byte	0x719
+ 1009 02d3 0D       		.uleb128 0xd
+ 1010 02d4 04010000 		.4byte	.LVL36
+ 1011 02d8 2F070000 		.4byte	0x72f
+ 1012 02dc 0D       		.uleb128 0xd
+ 1013 02dd 16010000 		.4byte	.LVL37
+ 1014 02e1 3A070000 		.4byte	0x73a
+ 1015 02e5 0D       		.uleb128 0xd
+ 1016 02e6 1C010000 		.4byte	.LVL38
+ 1017 02ea 45070000 		.4byte	0x745
+ 1018 02ee 0D       		.uleb128 0xd
+ 1019 02ef 2A010000 		.4byte	.LVL39
+ 1020 02f3 3A070000 		.4byte	0x73a
+ 1021 02f7 0D       		.uleb128 0xd
+ 1022 02f8 30010000 		.4byte	.LVL40
+ 1023 02fc 50070000 		.4byte	0x750
+ 1024 0300 0E       		.uleb128 0xe
+ 1025 0301 3E010000 		.4byte	.LVL41
+ 1026 0305 5B070000 		.4byte	0x75b
+ 1027 0309 13030000 		.4byte	0x313
+ 1028 030d 0F       		.uleb128 0xf
+ 1029 030e 01       		.uleb128 0x1
+ 1030 030f 50       		.byte	0x50
+ 1031 0310 01       		.uleb128 0x1
+ 1032 0311 31       		.byte	0x31
+ 1033 0312 00       		.byte	0
+ 1034 0313 0E       		.uleb128 0xe
+ 1035 0314 44010000 		.4byte	.LVL42
+ 1036 0318 66070000 		.4byte	0x766
+ 1037 031c 26030000 		.4byte	0x326
+ 1038 0320 0F       		.uleb128 0xf
+ 1039 0321 01       		.uleb128 0x1
+ 1040 0322 50       		.byte	0x50
+ 1041 0323 01       		.uleb128 0x1
+ 1042 0324 3C       		.byte	0x3c
+ 1043 0325 00       		.byte	0
+ 1044 0326 0E       		.uleb128 0xe
+ 1045 0327 4A010000 		.4byte	.LVL43
+ 1046 032b 71070000 		.4byte	0x771
+ 1047 032f 39030000 		.4byte	0x339
+ 1048 0333 0F       		.uleb128 0xf
+ 1049 0334 01       		.uleb128 0x1
+ 1050 0335 50       		.byte	0x50
+ 1051 0336 01       		.uleb128 0x1
+ 1052 0337 31       		.byte	0x31
+ 1053 0338 00       		.byte	0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 23
+
+
+ 1054 0339 0E       		.uleb128 0xe
+ 1055 033a 50010000 		.4byte	.LVL44
+ 1056 033e 7C070000 		.4byte	0x77c
+ 1057 0342 4C030000 		.4byte	0x34c
+ 1058 0346 0F       		.uleb128 0xf
+ 1059 0347 01       		.uleb128 0x1
+ 1060 0348 50       		.byte	0x50
+ 1061 0349 01       		.uleb128 0x1
+ 1062 034a 3C       		.byte	0x3c
+ 1063 034b 00       		.byte	0
+ 1064 034c 0E       		.uleb128 0xe
+ 1065 034d 56010000 		.4byte	.LVL45
+ 1066 0351 87070000 		.4byte	0x787
+ 1067 0355 5F030000 		.4byte	0x35f
+ 1068 0359 0F       		.uleb128 0xf
+ 1069 035a 01       		.uleb128 0x1
+ 1070 035b 50       		.byte	0x50
+ 1071 035c 01       		.uleb128 0x1
+ 1072 035d 31       		.byte	0x31
+ 1073 035e 00       		.byte	0
+ 1074 035f 0E       		.uleb128 0xe
+ 1075 0360 5C010000 		.4byte	.LVL46
+ 1076 0364 92070000 		.4byte	0x792
+ 1077 0368 72030000 		.4byte	0x372
+ 1078 036c 0F       		.uleb128 0xf
+ 1079 036d 01       		.uleb128 0x1
+ 1080 036e 50       		.byte	0x50
+ 1081 036f 01       		.uleb128 0x1
+ 1082 0370 3C       		.byte	0x3c
+ 1083 0371 00       		.byte	0
+ 1084 0372 0E       		.uleb128 0xe
+ 1085 0373 62010000 		.4byte	.LVL47
+ 1086 0377 9D070000 		.4byte	0x79d
+ 1087 037b 85030000 		.4byte	0x385
+ 1088 037f 0F       		.uleb128 0xf
+ 1089 0380 01       		.uleb128 0x1
+ 1090 0381 50       		.byte	0x50
+ 1091 0382 01       		.uleb128 0x1
+ 1092 0383 31       		.byte	0x31
+ 1093 0384 00       		.byte	0
+ 1094 0385 0E       		.uleb128 0xe
+ 1095 0386 68010000 		.4byte	.LVL48
+ 1096 038a A8070000 		.4byte	0x7a8
+ 1097 038e 98030000 		.4byte	0x398
+ 1098 0392 0F       		.uleb128 0xf
+ 1099 0393 01       		.uleb128 0x1
+ 1100 0394 50       		.byte	0x50
+ 1101 0395 01       		.uleb128 0x1
+ 1102 0396 3C       		.byte	0x3c
+ 1103 0397 00       		.byte	0
+ 1104 0398 0E       		.uleb128 0xe
+ 1105 0399 6E010000 		.4byte	.LVL49
+ 1106 039d B3070000 		.4byte	0x7b3
+ 1107 03a1 AB030000 		.4byte	0x3ab
+ 1108 03a5 0F       		.uleb128 0xf
+ 1109 03a6 01       		.uleb128 0x1
+ 1110 03a7 50       		.byte	0x50
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 24
+
+
+ 1111 03a8 01       		.uleb128 0x1
+ 1112 03a9 31       		.byte	0x31
+ 1113 03aa 00       		.byte	0
+ 1114 03ab 0E       		.uleb128 0xe
+ 1115 03ac 74010000 		.4byte	.LVL50
+ 1116 03b0 BE070000 		.4byte	0x7be
+ 1117 03b4 BE030000 		.4byte	0x3be
+ 1118 03b8 0F       		.uleb128 0xf
+ 1119 03b9 01       		.uleb128 0x1
+ 1120 03ba 50       		.byte	0x50
+ 1121 03bb 01       		.uleb128 0x1
+ 1122 03bc 3C       		.byte	0x3c
+ 1123 03bd 00       		.byte	0
+ 1124 03be 0E       		.uleb128 0xe
+ 1125 03bf 7A010000 		.4byte	.LVL51
+ 1126 03c3 C9070000 		.4byte	0x7c9
+ 1127 03c7 D1030000 		.4byte	0x3d1
+ 1128 03cb 0F       		.uleb128 0xf
+ 1129 03cc 01       		.uleb128 0x1
+ 1130 03cd 50       		.byte	0x50
+ 1131 03ce 01       		.uleb128 0x1
+ 1132 03cf 31       		.byte	0x31
+ 1133 03d0 00       		.byte	0
+ 1134 03d1 0E       		.uleb128 0xe
+ 1135 03d2 80010000 		.4byte	.LVL52
+ 1136 03d6 D4070000 		.4byte	0x7d4
+ 1137 03da E4030000 		.4byte	0x3e4
+ 1138 03de 0F       		.uleb128 0xf
+ 1139 03df 01       		.uleb128 0x1
+ 1140 03e0 50       		.byte	0x50
+ 1141 03e1 01       		.uleb128 0x1
+ 1142 03e2 3C       		.byte	0x3c
+ 1143 03e3 00       		.byte	0
+ 1144 03e4 0E       		.uleb128 0xe
+ 1145 03e5 86010000 		.4byte	.LVL53
+ 1146 03e9 DF070000 		.4byte	0x7df
+ 1147 03ed F7030000 		.4byte	0x3f7
+ 1148 03f1 0F       		.uleb128 0xf
+ 1149 03f2 01       		.uleb128 0x1
+ 1150 03f3 50       		.byte	0x50
+ 1151 03f4 01       		.uleb128 0x1
+ 1152 03f5 31       		.byte	0x31
+ 1153 03f6 00       		.byte	0
+ 1154 03f7 0E       		.uleb128 0xe
+ 1155 03f8 8C010000 		.4byte	.LVL54
+ 1156 03fc 5B070000 		.4byte	0x75b
+ 1157 0400 0A040000 		.4byte	0x40a
+ 1158 0404 0F       		.uleb128 0xf
+ 1159 0405 01       		.uleb128 0x1
+ 1160 0406 50       		.byte	0x50
+ 1161 0407 01       		.uleb128 0x1
+ 1162 0408 30       		.byte	0x30
+ 1163 0409 00       		.byte	0
+ 1164 040a 0E       		.uleb128 0xe
+ 1165 040b 92010000 		.4byte	.LVL55
+ 1166 040f EA070000 		.4byte	0x7ea
+ 1167 0413 1D040000 		.4byte	0x41d
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 25
+
+
+ 1168 0417 0F       		.uleb128 0xf
+ 1169 0418 01       		.uleb128 0x1
+ 1170 0419 50       		.byte	0x50
+ 1171 041a 01       		.uleb128 0x1
+ 1172 041b 3A       		.byte	0x3a
+ 1173 041c 00       		.byte	0
+ 1174 041d 0E       		.uleb128 0xe
+ 1175 041e 98010000 		.4byte	.LVL56
+ 1176 0422 66070000 		.4byte	0x766
+ 1177 0426 30040000 		.4byte	0x430
+ 1178 042a 0F       		.uleb128 0xf
+ 1179 042b 01       		.uleb128 0x1
+ 1180 042c 50       		.byte	0x50
+ 1181 042d 01       		.uleb128 0x1
+ 1182 042e 32       		.byte	0x32
+ 1183 042f 00       		.byte	0
+ 1184 0430 0E       		.uleb128 0xe
+ 1185 0431 9E010000 		.4byte	.LVL57
+ 1186 0435 7C070000 		.4byte	0x77c
+ 1187 0439 43040000 		.4byte	0x443
+ 1188 043d 0F       		.uleb128 0xf
+ 1189 043e 01       		.uleb128 0x1
+ 1190 043f 50       		.byte	0x50
+ 1191 0440 01       		.uleb128 0x1
+ 1192 0441 32       		.byte	0x32
+ 1193 0442 00       		.byte	0
+ 1194 0443 0E       		.uleb128 0xe
+ 1195 0444 A4010000 		.4byte	.LVL58
+ 1196 0448 92070000 		.4byte	0x792
+ 1197 044c 56040000 		.4byte	0x456
+ 1198 0450 0F       		.uleb128 0xf
+ 1199 0451 01       		.uleb128 0x1
+ 1200 0452 50       		.byte	0x50
+ 1201 0453 01       		.uleb128 0x1
+ 1202 0454 32       		.byte	0x32
+ 1203 0455 00       		.byte	0
+ 1204 0456 0E       		.uleb128 0xe
+ 1205 0457 AA010000 		.4byte	.LVL59
+ 1206 045b A8070000 		.4byte	0x7a8
+ 1207 045f 69040000 		.4byte	0x469
+ 1208 0463 0F       		.uleb128 0xf
+ 1209 0464 01       		.uleb128 0x1
+ 1210 0465 50       		.byte	0x50
+ 1211 0466 01       		.uleb128 0x1
+ 1212 0467 32       		.byte	0x32
+ 1213 0468 00       		.byte	0
+ 1214 0469 0E       		.uleb128 0xe
+ 1215 046a B0010000 		.4byte	.LVL60
+ 1216 046e BE070000 		.4byte	0x7be
+ 1217 0472 7C040000 		.4byte	0x47c
+ 1218 0476 0F       		.uleb128 0xf
+ 1219 0477 01       		.uleb128 0x1
+ 1220 0478 50       		.byte	0x50
+ 1221 0479 01       		.uleb128 0x1
+ 1222 047a 32       		.byte	0x32
+ 1223 047b 00       		.byte	0
+ 1224 047c 0E       		.uleb128 0xe
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 26
+
+
+ 1225 047d B6010000 		.4byte	.LVL61
+ 1226 0481 D4070000 		.4byte	0x7d4
+ 1227 0485 8F040000 		.4byte	0x48f
+ 1228 0489 0F       		.uleb128 0xf
+ 1229 048a 01       		.uleb128 0x1
+ 1230 048b 50       		.byte	0x50
+ 1231 048c 01       		.uleb128 0x1
+ 1232 048d 32       		.byte	0x32
+ 1233 048e 00       		.byte	0
+ 1234 048f 10       		.uleb128 0x10
+ 1235 0490 BE010000 		.4byte	.LVL62
+ 1236 0494 F5070000 		.4byte	0x7f5
+ 1237 0498 0F       		.uleb128 0xf
+ 1238 0499 01       		.uleb128 0x1
+ 1239 049a 50       		.byte	0x50
+ 1240 049b 02       		.uleb128 0x2
+ 1241 049c 91       		.byte	0x91
+ 1242 049d 5C       		.sleb128 -36
+ 1243 049e 0F       		.uleb128 0xf
+ 1244 049f 01       		.uleb128 0x1
+ 1245 04a0 51       		.byte	0x51
+ 1246 04a1 01       		.uleb128 0x1
+ 1247 04a2 31       		.byte	0x31
+ 1248 04a3 00       		.byte	0
+ 1249 04a4 00       		.byte	0
+ 1250 04a5 11       		.uleb128 0x11
+ 1251 04a6 8E010000 		.4byte	.LASF31
+ 1252 04aa 01       		.byte	0x1
+ 1253 04ab 78       		.byte	0x78
+ 1254 04ac 00000000 		.4byte	.LFB70
+ 1255 04b0 54000000 		.4byte	.LFE70-.LFB70
+ 1256 04b4 01       		.uleb128 0x1
+ 1257 04b5 9C       		.byte	0x9c
+ 1258 04b6 3B050000 		.4byte	0x53b
+ 1259 04ba 0E       		.uleb128 0xe
+ 1260 04bb 10000000 		.4byte	.LVL63
+ 1261 04bf 01080000 		.4byte	0x801
+ 1262 04c3 CD040000 		.4byte	0x4cd
+ 1263 04c7 0F       		.uleb128 0xf
+ 1264 04c8 01       		.uleb128 0x1
+ 1265 04c9 50       		.byte	0x50
+ 1266 04ca 01       		.uleb128 0x1
+ 1267 04cb 31       		.byte	0x31
+ 1268 04cc 00       		.byte	0
+ 1269 04cd 0D       		.uleb128 0xd
+ 1270 04ce 14000000 		.4byte	.LVL64
+ 1271 04d2 0C080000 		.4byte	0x80c
+ 1272 04d6 0D       		.uleb128 0xd
+ 1273 04d7 18000000 		.4byte	.LVL65
+ 1274 04db 17080000 		.4byte	0x817
+ 1275 04df 0D       		.uleb128 0xd
+ 1276 04e0 1C000000 		.4byte	.LVL66
+ 1277 04e4 22080000 		.4byte	0x822
+ 1278 04e8 0D       		.uleb128 0xd
+ 1279 04e9 20000000 		.4byte	.LVL67
+ 1280 04ed 2D080000 		.4byte	0x82d
+ 1281 04f1 0D       		.uleb128 0xd
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 27
+
+
+ 1282 04f2 24000000 		.4byte	.LVL68
+ 1283 04f6 38080000 		.4byte	0x838
+ 1284 04fa 0D       		.uleb128 0xd
+ 1285 04fb 28000000 		.4byte	.LVL69
+ 1286 04ff 43080000 		.4byte	0x843
+ 1287 0503 10       		.uleb128 0x10
+ 1288 0504 3C000000 		.4byte	.LVL70
+ 1289 0508 4E080000 		.4byte	0x84e
+ 1290 050c 0F       		.uleb128 0xf
+ 1291 050d 01       		.uleb128 0x1
+ 1292 050e 50       		.byte	0x50
+ 1293 050f 05       		.uleb128 0x5
+ 1294 0510 03       		.byte	0x3
+ 1295 0511 00000000 		.4byte	ReflectanceTask
+ 1296 0515 0F       		.uleb128 0xf
+ 1297 0516 01       		.uleb128 0x1
+ 1298 0517 51       		.byte	0x51
+ 1299 0518 05       		.uleb128 0x5
+ 1300 0519 03       		.byte	0x3
+ 1301 051a 00000000 		.4byte	.LC0
+ 1302 051e 0F       		.uleb128 0xf
+ 1303 051f 01       		.uleb128 0x1
+ 1304 0520 52       		.byte	0x52
+ 1305 0521 02       		.uleb128 0x2
+ 1306 0522 08       		.byte	0x8
+ 1307 0523 64       		.byte	0x64
+ 1308 0524 0F       		.uleb128 0xf
+ 1309 0525 01       		.uleb128 0x1
+ 1310 0526 53       		.byte	0x53
+ 1311 0527 01       		.uleb128 0x1
+ 1312 0528 30       		.byte	0x30
+ 1313 0529 0F       		.uleb128 0xf
+ 1314 052a 02       		.uleb128 0x2
+ 1315 052b 7D       		.byte	0x7d
+ 1316 052c 00       		.sleb128 0
+ 1317 052d 01       		.uleb128 0x1
+ 1318 052e 33       		.byte	0x33
+ 1319 052f 0F       		.uleb128 0xf
+ 1320 0530 02       		.uleb128 0x2
+ 1321 0531 7D       		.byte	0x7d
+ 1322 0532 04       		.sleb128 4
+ 1323 0533 05       		.uleb128 0x5
+ 1324 0534 03       		.byte	0x3
+ 1325 0535 0C000000 		.4byte	.LANCHOR0+12
+ 1326 0539 00       		.byte	0
+ 1327 053a 00       		.byte	0
+ 1328 053b 11       		.uleb128 0x11
+ 1329 053c 84050000 		.4byte	.LASF32
+ 1330 0540 01       		.byte	0x1
+ 1331 0541 8D       		.byte	0x8d
+ 1332 0542 00000000 		.4byte	.LFB71
+ 1333 0546 18000000 		.4byte	.LFE71-.LFB71
+ 1334 054a 01       		.uleb128 0x1
+ 1335 054b 9C       		.byte	0x9c
+ 1336 054c 60050000 		.4byte	0x560
+ 1337 0550 0A       		.uleb128 0xa
+ 1338 0551 3F020000 		.4byte	.LASF34
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 28
+
+
+ 1339 0555 01       		.byte	0x1
+ 1340 0556 8D       		.byte	0x8d
+ 1341 0557 60050000 		.4byte	0x560
+ 1342 055b 49000000 		.4byte	.LLST2
+ 1343 055f 00       		.byte	0
+ 1344 0560 12       		.uleb128 0x12
+ 1345 0561 04       		.byte	0x4
+ 1346 0562 FF000000 		.4byte	0xff
+ 1347 0566 11       		.uleb128 0x11
+ 1348 0567 FF010000 		.4byte	.LASF35
+ 1349 056b 01       		.byte	0x1
+ 1350 056c 97       		.byte	0x97
+ 1351 056d 00000000 		.4byte	.LFB72
+ 1352 0571 9C000000 		.4byte	.LFE72-.LFB72
+ 1353 0575 01       		.uleb128 0x1
+ 1354 0576 9C       		.byte	0x9c
+ 1355 0577 89050000 		.4byte	0x589
+ 1356 057b 13       		.uleb128 0x13
+ 1357 057c 39050000 		.4byte	.LASF36
+ 1358 0580 01       		.byte	0x1
+ 1359 0581 97       		.byte	0x97
+ 1360 0582 60050000 		.4byte	0x560
+ 1361 0586 01       		.uleb128 0x1
+ 1362 0587 50       		.byte	0x50
+ 1363 0588 00       		.byte	0
+ 1364 0589 11       		.uleb128 0x11
+ 1365 058a D5020000 		.4byte	.LASF37
+ 1366 058e 01       		.byte	0x1
+ 1367 058f BA       		.byte	0xba
+ 1368 0590 00000000 		.4byte	.LFB73
+ 1369 0594 20000000 		.4byte	.LFE73-.LFB73
+ 1370 0598 01       		.uleb128 0x1
+ 1371 0599 9C       		.byte	0x9c
+ 1372 059a ED050000 		.4byte	0x5ed
+ 1373 059e 14       		.uleb128 0x14
+ 1374 059f 6C3300   		.ascii	"l3\000"
+ 1375 05a2 01       		.byte	0x1
+ 1376 05a3 BA       		.byte	0xba
+ 1377 05a4 A3000000 		.4byte	0xa3
+ 1378 05a8 01       		.uleb128 0x1
+ 1379 05a9 50       		.byte	0x50
+ 1380 05aa 14       		.uleb128 0x14
+ 1381 05ab 6C3200   		.ascii	"l2\000"
+ 1382 05ae 01       		.byte	0x1
+ 1383 05af BA       		.byte	0xba
+ 1384 05b0 A3000000 		.4byte	0xa3
+ 1385 05b4 01       		.uleb128 0x1
+ 1386 05b5 51       		.byte	0x51
+ 1387 05b6 15       		.uleb128 0x15
+ 1388 05b7 6C3100   		.ascii	"l1\000"
+ 1389 05ba 01       		.byte	0x1
+ 1390 05bb BA       		.byte	0xba
+ 1391 05bc A3000000 		.4byte	0xa3
+ 1392 05c0 75000000 		.4byte	.LLST3
+ 1393 05c4 14       		.uleb128 0x14
+ 1394 05c5 723100   		.ascii	"r1\000"
+ 1395 05c8 01       		.byte	0x1
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 29
+
+
+ 1396 05c9 BA       		.byte	0xba
+ 1397 05ca A3000000 		.4byte	0xa3
+ 1398 05ce 01       		.uleb128 0x1
+ 1399 05cf 53       		.byte	0x53
+ 1400 05d0 15       		.uleb128 0x15
+ 1401 05d1 723200   		.ascii	"r2\000"
+ 1402 05d4 01       		.byte	0x1
+ 1403 05d5 BA       		.byte	0xba
+ 1404 05d6 A3000000 		.4byte	0xa3
+ 1405 05da 97000000 		.4byte	.LLST4
+ 1406 05de 15       		.uleb128 0x15
+ 1407 05df 723300   		.ascii	"r3\000"
+ 1408 05e2 01       		.byte	0x1
+ 1409 05e3 BA       		.byte	0xba
+ 1410 05e4 A3000000 		.4byte	0xa3
+ 1411 05e8 B7000000 		.4byte	.LLST5
+ 1412 05ec 00       		.byte	0
+ 1413 05ed 0B       		.uleb128 0xb
+ 1414 05ee A0000000 		.4byte	.LASF38
+ 1415 05f2 01       		.byte	0x1
+ 1416 05f3 0E       		.byte	0xe
+ 1417 05f4 FE050000 		.4byte	0x5fe
+ 1418 05f8 05       		.uleb128 0x5
+ 1419 05f9 03       		.byte	0x3
+ 1420 05fa 00000000 		.4byte	sensors
+ 1421 05fe 16       		.uleb128 0x16
+ 1422 05ff FF000000 		.4byte	0xff
+ 1423 0603 0B       		.uleb128 0xb
+ 1424 0604 21040000 		.4byte	.LASF39
+ 1425 0608 01       		.byte	0x1
+ 1426 0609 0F       		.byte	0xf
+ 1427 060a FE050000 		.4byte	0x5fe
+ 1428 060e 05       		.uleb128 0x5
+ 1429 060f 03       		.byte	0x3
+ 1430 0610 10000000 		.4byte	digital_sensor_value
+ 1431 0614 0B       		.uleb128 0xb
+ 1432 0615 13020000 		.4byte	.LASF40
+ 1433 0619 01       		.byte	0x1
+ 1434 061a 10       		.byte	0x10
+ 1435 061b FF000000 		.4byte	0xff
+ 1436 061f 05       		.uleb128 0x5
+ 1437 0620 03       		.byte	0x3
+ 1438 0621 00000000 		.4byte	threshold
+ 1439 0625 0B       		.uleb128 0xb
+ 1440 0626 EC000000 		.4byte	.LASF41
+ 1441 062a 01       		.byte	0x1
+ 1442 062b 11       		.byte	0x11
+ 1443 062c F4000000 		.4byte	0xf4
+ 1444 0630 05       		.uleb128 0x5
+ 1445 0631 03       		.byte	0x3
+ 1446 0632 0C000000 		.4byte	ReflectanceHandle
+ 1447 0636 17       		.uleb128 0x17
+ 1448 0637 D9050000 		.4byte	.LASF95
+ 1449 063b 17       		.byte	0x17
+ 1450 063c 1207     		.2byte	0x712
+ 1451 063e 42060000 		.4byte	0x642
+ 1452 0642 16       		.uleb128 0x16
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 30
+
+
+ 1453 0643 AE000000 		.4byte	0xae
+ 1454 0647 18       		.uleb128 0x18
+ 1455 0648 46020000 		.4byte	.LASF42
+ 1456 064c 46020000 		.4byte	.LASF42
+ 1457 0650 06       		.byte	0x6
+ 1458 0651 3E05     		.2byte	0x53e
+ 1459 0653 19       		.uleb128 0x19
+ 1460 0654 C3010000 		.4byte	.LASF43
+ 1461 0658 C3010000 		.4byte	.LASF43
+ 1462 065c 08       		.byte	0x8
+ 1463 065d 5E       		.byte	0x5e
+ 1464 065e 19       		.uleb128 0x19
+ 1465 065f 41010000 		.4byte	.LASF44
+ 1466 0663 41010000 		.4byte	.LASF44
+ 1467 0667 09       		.byte	0x9
+ 1468 0668 5E       		.byte	0x5e
+ 1469 0669 19       		.uleb128 0x19
+ 1470 066a 5D010000 		.4byte	.LASF45
+ 1471 066e 5D010000 		.4byte	.LASF45
+ 1472 0672 0A       		.byte	0xa
+ 1473 0673 5E       		.byte	0x5e
+ 1474 0674 19       		.uleb128 0x19
+ 1475 0675 EB050000 		.4byte	.LASF46
+ 1476 0679 EB050000 		.4byte	.LASF46
+ 1477 067d 0B       		.byte	0xb
+ 1478 067e 5E       		.byte	0x5e
+ 1479 067f 19       		.uleb128 0x19
+ 1480 0680 13010000 		.4byte	.LASF47
+ 1481 0684 13010000 		.4byte	.LASF47
+ 1482 0688 0C       		.byte	0xc
+ 1483 0689 5E       		.byte	0x5e
+ 1484 068a 19       		.uleb128 0x19
+ 1485 068b 46000000 		.4byte	.LASF48
+ 1486 068f 46000000 		.4byte	.LASF48
+ 1487 0693 0D       		.byte	0xd
+ 1488 0694 5E       		.byte	0x5e
+ 1489 0695 19       		.uleb128 0x19
+ 1490 0696 41050000 		.4byte	.LASF49
+ 1491 069a 41050000 		.4byte	.LASF49
+ 1492 069e 08       		.byte	0x8
+ 1493 069f 67       		.byte	0x67
+ 1494 06a0 19       		.uleb128 0x19
+ 1495 06a1 79010000 		.4byte	.LASF50
+ 1496 06a5 79010000 		.4byte	.LASF50
+ 1497 06a9 08       		.byte	0x8
+ 1498 06aa 6B       		.byte	0x6b
+ 1499 06ab 19       		.uleb128 0x19
+ 1500 06ac 31000000 		.4byte	.LASF51
+ 1501 06b0 31000000 		.4byte	.LASF51
+ 1502 06b4 08       		.byte	0x8
+ 1503 06b5 69       		.byte	0x69
+ 1504 06b6 19       		.uleb128 0x19
+ 1505 06b7 7A040000 		.4byte	.LASF52
+ 1506 06bb 7A040000 		.4byte	.LASF52
+ 1507 06bf 0D       		.byte	0xd
+ 1508 06c0 67       		.byte	0x67
+ 1509 06c1 19       		.uleb128 0x19
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 31
+
+
+ 1510 06c2 0C040000 		.4byte	.LASF53
+ 1511 06c6 0C040000 		.4byte	.LASF53
+ 1512 06ca 0D       		.byte	0xd
+ 1513 06cb 6B       		.byte	0x6b
+ 1514 06cc 19       		.uleb128 0x19
+ 1515 06cd 75020000 		.4byte	.LASF54
+ 1516 06d1 75020000 		.4byte	.LASF54
+ 1517 06d5 0D       		.byte	0xd
+ 1518 06d6 69       		.byte	0x69
+ 1519 06d7 19       		.uleb128 0x19
+ 1520 06d8 AF010000 		.4byte	.LASF55
+ 1521 06dc AF010000 		.4byte	.LASF55
+ 1522 06e0 09       		.byte	0x9
+ 1523 06e1 67       		.byte	0x67
+ 1524 06e2 19       		.uleb128 0x19
+ 1525 06e3 2A030000 		.4byte	.LASF56
+ 1526 06e7 2A030000 		.4byte	.LASF56
+ 1527 06eb 09       		.byte	0x9
+ 1528 06ec 6B       		.byte	0x6b
+ 1529 06ed 19       		.uleb128 0x19
+ 1530 06ee EA010000 		.4byte	.LASF57
+ 1531 06f2 EA010000 		.4byte	.LASF57
+ 1532 06f6 09       		.byte	0x9
+ 1533 06f7 69       		.byte	0x69
+ 1534 06f8 19       		.uleb128 0x19
+ 1535 06f9 B2040000 		.4byte	.LASF58
+ 1536 06fd B2040000 		.4byte	.LASF58
+ 1537 0701 0C       		.byte	0xc
+ 1538 0702 67       		.byte	0x67
+ 1539 0703 19       		.uleb128 0x19
+ 1540 0704 C4050000 		.4byte	.LASF59
+ 1541 0708 C4050000 		.4byte	.LASF59
+ 1542 070c 0C       		.byte	0xc
+ 1543 070d 6B       		.byte	0x6b
+ 1544 070e 19       		.uleb128 0x19
+ 1545 070f FE000000 		.4byte	.LASF60
+ 1546 0713 FE000000 		.4byte	.LASF60
+ 1547 0717 0C       		.byte	0xc
+ 1548 0718 69       		.byte	0x69
+ 1549 0719 19       		.uleb128 0x19
+ 1550 071a 22020000 		.4byte	.LASF61
+ 1551 071e 22020000 		.4byte	.LASF61
+ 1552 0722 0A       		.byte	0xa
+ 1553 0723 67       		.byte	0x67
+ 1554 0724 19       		.uleb128 0x19
+ 1555 0725 55050000 		.4byte	.LASF62
+ 1556 0729 55050000 		.4byte	.LASF62
+ 1557 072d 0A       		.byte	0xa
+ 1558 072e 6B       		.byte	0x6b
+ 1559 072f 19       		.uleb128 0x19
+ 1560 0730 7E000000 		.4byte	.LASF63
+ 1561 0734 7E000000 		.4byte	.LASF63
+ 1562 0738 0A       		.byte	0xa
+ 1563 0739 69       		.byte	0x69
+ 1564 073a 19       		.uleb128 0x19
+ 1565 073b 16050000 		.4byte	.LASF64
+ 1566 073f 16050000 		.4byte	.LASF64
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 32
+
+
+ 1567 0743 0B       		.byte	0xb
+ 1568 0744 67       		.byte	0x67
+ 1569 0745 19       		.uleb128 0x19
+ 1570 0746 65040000 		.4byte	.LASF65
+ 1571 074a 65040000 		.4byte	.LASF65
+ 1572 074e 0B       		.byte	0xb
+ 1573 074f 6B       		.byte	0x6b
+ 1574 0750 19       		.uleb128 0x19
+ 1575 0751 B0020000 		.4byte	.LASF66
+ 1576 0755 B0020000 		.4byte	.LASF66
+ 1577 0759 0B       		.byte	0xb
+ 1578 075a 69       		.byte	0x69
+ 1579 075b 19       		.uleb128 0x19
+ 1580 075c 10000000 		.4byte	.LASF67
+ 1581 0760 10000000 		.4byte	.LASF67
+ 1582 0764 0E       		.byte	0xe
+ 1583 0765 2F       		.byte	0x2f
+ 1584 0766 19       		.uleb128 0x19
+ 1585 0767 C5020000 		.4byte	.LASF68
+ 1586 076b C5020000 		.4byte	.LASF68
+ 1587 076f 0F       		.byte	0xf
+ 1588 0770 27       		.byte	0x27
+ 1589 0771 19       		.uleb128 0x19
+ 1590 0772 55030000 		.4byte	.LASF69
+ 1591 0776 55030000 		.4byte	.LASF69
+ 1592 077a 0F       		.byte	0xf
+ 1593 077b 26       		.byte	0x26
+ 1594 077c 19       		.uleb128 0x19
+ 1595 077d 95050000 		.4byte	.LASF70
+ 1596 0781 95050000 		.4byte	.LASF70
+ 1597 0785 10       		.byte	0x10
+ 1598 0786 27       		.byte	0x27
+ 1599 0787 19       		.uleb128 0x19
+ 1600 0788 6C000000 		.4byte	.LASF71
+ 1601 078c 6C000000 		.4byte	.LASF71
+ 1602 0790 10       		.byte	0x10
+ 1603 0791 26       		.byte	0x26
+ 1604 0792 19       		.uleb128 0x19
+ 1605 0793 21060000 		.4byte	.LASF72
+ 1606 0797 21060000 		.4byte	.LASF72
+ 1607 079b 11       		.byte	0x11
+ 1608 079c 27       		.byte	0x27
+ 1609 079d 19       		.uleb128 0x19
+ 1610 079e 36040000 		.4byte	.LASF73
+ 1611 07a2 36040000 		.4byte	.LASF73
+ 1612 07a6 11       		.byte	0x11
+ 1613 07a7 26       		.byte	0x26
+ 1614 07a8 19       		.uleb128 0x19
+ 1615 07a9 D1000000 		.4byte	.LASF74
+ 1616 07ad D1000000 		.4byte	.LASF74
+ 1617 07b1 12       		.byte	0x12
+ 1618 07b2 27       		.byte	0x27
+ 1619 07b3 19       		.uleb128 0x19
+ 1620 07b4 C6040000 		.4byte	.LASF75
+ 1621 07b8 C6040000 		.4byte	.LASF75
+ 1622 07bc 12       		.byte	0x12
+ 1623 07bd 26       		.byte	0x26
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 33
+
+
+ 1624 07be 19       		.uleb128 0x19
+ 1625 07bf A5050000 		.4byte	.LASF76
+ 1626 07c3 A5050000 		.4byte	.LASF76
+ 1627 07c7 13       		.byte	0x13
+ 1628 07c8 27       		.byte	0x27
+ 1629 07c9 19       		.uleb128 0x19
+ 1630 07ca A0010000 		.4byte	.LASF77
+ 1631 07ce A0010000 		.4byte	.LASF77
+ 1632 07d2 13       		.byte	0x13
+ 1633 07d3 26       		.byte	0x26
+ 1634 07d4 19       		.uleb128 0x19
+ 1635 07d5 8A020000 		.4byte	.LASF78
+ 1636 07d9 8A020000 		.4byte	.LASF78
+ 1637 07dd 14       		.byte	0x14
+ 1638 07de 27       		.byte	0x27
+ 1639 07df 19       		.uleb128 0x19
+ 1640 07e0 4F060000 		.4byte	.LASF79
+ 1641 07e4 4F060000 		.4byte	.LASF79
+ 1642 07e8 14       		.byte	0x14
+ 1643 07e9 26       		.byte	0x26
+ 1644 07ea 19       		.uleb128 0x19
+ 1645 07eb A6020000 		.4byte	.LASF80
+ 1646 07ef A6020000 		.4byte	.LASF80
+ 1647 07f3 15       		.byte	0x15
+ 1648 07f4 77       		.byte	0x77
+ 1649 07f5 18       		.uleb128 0x18
+ 1650 07f6 6A050000 		.4byte	.LASF81
+ 1651 07fa 6A050000 		.4byte	.LASF81
+ 1652 07fe 06       		.byte	0x6
+ 1653 07ff 2803     		.2byte	0x328
+ 1654 0801 19       		.uleb128 0x19
+ 1655 0802 2A050000 		.4byte	.LASF82
+ 1656 0806 2A050000 		.4byte	.LASF82
+ 1657 080a 16       		.byte	0x16
+ 1658 080b 26       		.byte	0x26
+ 1659 080c 19       		.uleb128 0x19
+ 1660 080d 40060000 		.4byte	.LASF83
+ 1661 0811 40060000 		.4byte	.LASF83
+ 1662 0815 08       		.byte	0x8
+ 1663 0816 5A       		.byte	0x5a
+ 1664 0817 19       		.uleb128 0x19
+ 1665 0818 12030000 		.4byte	.LASF84
+ 1666 081c 12030000 		.4byte	.LASF84
+ 1667 0820 09       		.byte	0x9
+ 1668 0821 5A       		.byte	0x5a
+ 1669 0822 19       		.uleb128 0x19
+ 1670 0823 22000000 		.4byte	.LASF85
+ 1671 0827 22000000 		.4byte	.LASF85
+ 1672 082b 0A       		.byte	0xa
+ 1673 082c 5A       		.byte	0x5a
+ 1674 082d 19       		.uleb128 0x19
+ 1675 082e 9A040000 		.4byte	.LASF86
+ 1676 0832 9A040000 		.4byte	.LASF86
+ 1677 0836 0B       		.byte	0xb
+ 1678 0837 5A       		.byte	0x5a
+ 1679 0838 19       		.uleb128 0x19
+ 1680 0839 31060000 		.4byte	.LASF87
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 34
+
+
+ 1681 083d 31060000 		.4byte	.LASF87
+ 1682 0841 0C       		.byte	0xc
+ 1683 0842 5A       		.byte	0x5a
+ 1684 0843 19       		.uleb128 0x19
+ 1685 0844 58020000 		.4byte	.LASF88
+ 1686 0848 58020000 		.4byte	.LASF88
+ 1687 084c 0D       		.byte	0xd
+ 1688 084d 5A       		.byte	0x5a
+ 1689 084e 18       		.uleb128 0x18
+ 1690 084f 8E040000 		.4byte	.LASF89
+ 1691 0853 8E040000 		.4byte	.LASF89
+ 1692 0857 06       		.byte	0x6
+ 1693 0858 4101     		.2byte	0x141
+ 1694 085a 00       		.byte	0
+ 1695              		.section	.debug_abbrev,"",%progbits
+ 1696              	.Ldebug_abbrev0:
+ 1697 0000 01       		.uleb128 0x1
+ 1698 0001 11       		.uleb128 0x11
+ 1699 0002 01       		.byte	0x1
+ 1700 0003 25       		.uleb128 0x25
+ 1701 0004 0E       		.uleb128 0xe
+ 1702 0005 13       		.uleb128 0x13
+ 1703 0006 0B       		.uleb128 0xb
+ 1704 0007 03       		.uleb128 0x3
+ 1705 0008 0E       		.uleb128 0xe
+ 1706 0009 1B       		.uleb128 0x1b
+ 1707 000a 0E       		.uleb128 0xe
+ 1708 000b 55       		.uleb128 0x55
+ 1709 000c 17       		.uleb128 0x17
+ 1710 000d 11       		.uleb128 0x11
+ 1711 000e 01       		.uleb128 0x1
+ 1712 000f 10       		.uleb128 0x10
+ 1713 0010 17       		.uleb128 0x17
+ 1714 0011 00       		.byte	0
+ 1715 0012 00       		.byte	0
+ 1716 0013 02       		.uleb128 0x2
+ 1717 0014 24       		.uleb128 0x24
+ 1718 0015 00       		.byte	0
+ 1719 0016 0B       		.uleb128 0xb
+ 1720 0017 0B       		.uleb128 0xb
+ 1721 0018 3E       		.uleb128 0x3e
+ 1722 0019 0B       		.uleb128 0xb
+ 1723 001a 03       		.uleb128 0x3
+ 1724 001b 0E       		.uleb128 0xe
+ 1725 001c 00       		.byte	0
+ 1726 001d 00       		.byte	0
+ 1727 001e 03       		.uleb128 0x3
+ 1728 001f 16       		.uleb128 0x16
+ 1729 0020 00       		.byte	0
+ 1730 0021 03       		.uleb128 0x3
+ 1731 0022 0E       		.uleb128 0xe
+ 1732 0023 3A       		.uleb128 0x3a
+ 1733 0024 0B       		.uleb128 0xb
+ 1734 0025 3B       		.uleb128 0x3b
+ 1735 0026 0B       		.uleb128 0xb
+ 1736 0027 49       		.uleb128 0x49
+ 1737 0028 13       		.uleb128 0x13
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 35
+
+
+ 1738 0029 00       		.byte	0
+ 1739 002a 00       		.byte	0
+ 1740 002b 04       		.uleb128 0x4
+ 1741 002c 24       		.uleb128 0x24
+ 1742 002d 00       		.byte	0
+ 1743 002e 0B       		.uleb128 0xb
+ 1744 002f 0B       		.uleb128 0xb
+ 1745 0030 3E       		.uleb128 0x3e
+ 1746 0031 0B       		.uleb128 0xb
+ 1747 0032 03       		.uleb128 0x3
+ 1748 0033 08       		.uleb128 0x8
+ 1749 0034 00       		.byte	0
+ 1750 0035 00       		.byte	0
+ 1751 0036 05       		.uleb128 0x5
+ 1752 0037 0F       		.uleb128 0xf
+ 1753 0038 00       		.byte	0
+ 1754 0039 0B       		.uleb128 0xb
+ 1755 003a 0B       		.uleb128 0xb
+ 1756 003b 00       		.byte	0
+ 1757 003c 00       		.byte	0
+ 1758 003d 06       		.uleb128 0x6
+ 1759 003e 16       		.uleb128 0x16
+ 1760 003f 00       		.byte	0
+ 1761 0040 03       		.uleb128 0x3
+ 1762 0041 0E       		.uleb128 0xe
+ 1763 0042 3A       		.uleb128 0x3a
+ 1764 0043 0B       		.uleb128 0xb
+ 1765 0044 3B       		.uleb128 0x3b
+ 1766 0045 05       		.uleb128 0x5
+ 1767 0046 49       		.uleb128 0x49
+ 1768 0047 13       		.uleb128 0x13
+ 1769 0048 00       		.byte	0
+ 1770 0049 00       		.byte	0
+ 1771 004a 07       		.uleb128 0x7
+ 1772 004b 13       		.uleb128 0x13
+ 1773 004c 01       		.byte	0x1
+ 1774 004d 03       		.uleb128 0x3
+ 1775 004e 0E       		.uleb128 0xe
+ 1776 004f 0B       		.uleb128 0xb
+ 1777 0050 0B       		.uleb128 0xb
+ 1778 0051 3A       		.uleb128 0x3a
+ 1779 0052 0B       		.uleb128 0xb
+ 1780 0053 3B       		.uleb128 0x3b
+ 1781 0054 0B       		.uleb128 0xb
+ 1782 0055 01       		.uleb128 0x1
+ 1783 0056 13       		.uleb128 0x13
+ 1784 0057 00       		.byte	0
+ 1785 0058 00       		.byte	0
+ 1786 0059 08       		.uleb128 0x8
+ 1787 005a 0D       		.uleb128 0xd
+ 1788 005b 00       		.byte	0
+ 1789 005c 03       		.uleb128 0x3
+ 1790 005d 08       		.uleb128 0x8
+ 1791 005e 3A       		.uleb128 0x3a
+ 1792 005f 0B       		.uleb128 0xb
+ 1793 0060 3B       		.uleb128 0x3b
+ 1794 0061 0B       		.uleb128 0xb
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 36
+
+
+ 1795 0062 49       		.uleb128 0x49
+ 1796 0063 13       		.uleb128 0x13
+ 1797 0064 38       		.uleb128 0x38
+ 1798 0065 0B       		.uleb128 0xb
+ 1799 0066 00       		.byte	0
+ 1800 0067 00       		.byte	0
+ 1801 0068 09       		.uleb128 0x9
+ 1802 0069 2E       		.uleb128 0x2e
+ 1803 006a 01       		.byte	0x1
+ 1804 006b 3F       		.uleb128 0x3f
+ 1805 006c 19       		.uleb128 0x19
+ 1806 006d 03       		.uleb128 0x3
+ 1807 006e 0E       		.uleb128 0xe
+ 1808 006f 3A       		.uleb128 0x3a
+ 1809 0070 0B       		.uleb128 0xb
+ 1810 0071 3B       		.uleb128 0x3b
+ 1811 0072 0B       		.uleb128 0xb
+ 1812 0073 27       		.uleb128 0x27
+ 1813 0074 19       		.uleb128 0x19
+ 1814 0075 8701     		.uleb128 0x87
+ 1815 0077 19       		.uleb128 0x19
+ 1816 0078 11       		.uleb128 0x11
+ 1817 0079 01       		.uleb128 0x1
+ 1818 007a 12       		.uleb128 0x12
+ 1819 007b 06       		.uleb128 0x6
+ 1820 007c 40       		.uleb128 0x40
+ 1821 007d 18       		.uleb128 0x18
+ 1822 007e 9742     		.uleb128 0x2117
+ 1823 0080 19       		.uleb128 0x19
+ 1824 0081 01       		.uleb128 0x1
+ 1825 0082 13       		.uleb128 0x13
+ 1826 0083 00       		.byte	0
+ 1827 0084 00       		.byte	0
+ 1828 0085 0A       		.uleb128 0xa
+ 1829 0086 05       		.uleb128 0x5
+ 1830 0087 00       		.byte	0
+ 1831 0088 03       		.uleb128 0x3
+ 1832 0089 0E       		.uleb128 0xe
+ 1833 008a 3A       		.uleb128 0x3a
+ 1834 008b 0B       		.uleb128 0xb
+ 1835 008c 3B       		.uleb128 0x3b
+ 1836 008d 0B       		.uleb128 0xb
+ 1837 008e 49       		.uleb128 0x49
+ 1838 008f 13       		.uleb128 0x13
+ 1839 0090 02       		.uleb128 0x2
+ 1840 0091 17       		.uleb128 0x17
+ 1841 0092 00       		.byte	0
+ 1842 0093 00       		.byte	0
+ 1843 0094 0B       		.uleb128 0xb
+ 1844 0095 34       		.uleb128 0x34
+ 1845 0096 00       		.byte	0
+ 1846 0097 03       		.uleb128 0x3
+ 1847 0098 0E       		.uleb128 0xe
+ 1848 0099 3A       		.uleb128 0x3a
+ 1849 009a 0B       		.uleb128 0xb
+ 1850 009b 3B       		.uleb128 0x3b
+ 1851 009c 0B       		.uleb128 0xb
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 37
+
+
+ 1852 009d 49       		.uleb128 0x49
+ 1853 009e 13       		.uleb128 0x13
+ 1854 009f 02       		.uleb128 0x2
+ 1855 00a0 18       		.uleb128 0x18
+ 1856 00a1 00       		.byte	0
+ 1857 00a2 00       		.byte	0
+ 1858 00a3 0C       		.uleb128 0xc
+ 1859 00a4 34       		.uleb128 0x34
+ 1860 00a5 00       		.byte	0
+ 1861 00a6 03       		.uleb128 0x3
+ 1862 00a7 0E       		.uleb128 0xe
+ 1863 00a8 3A       		.uleb128 0x3a
+ 1864 00a9 0B       		.uleb128 0xb
+ 1865 00aa 3B       		.uleb128 0x3b
+ 1866 00ab 0B       		.uleb128 0xb
+ 1867 00ac 49       		.uleb128 0x49
+ 1868 00ad 13       		.uleb128 0x13
+ 1869 00ae 02       		.uleb128 0x2
+ 1870 00af 17       		.uleb128 0x17
+ 1871 00b0 00       		.byte	0
+ 1872 00b1 00       		.byte	0
+ 1873 00b2 0D       		.uleb128 0xd
+ 1874 00b3 898201   		.uleb128 0x4109
+ 1875 00b6 00       		.byte	0
+ 1876 00b7 11       		.uleb128 0x11
+ 1877 00b8 01       		.uleb128 0x1
+ 1878 00b9 31       		.uleb128 0x31
+ 1879 00ba 13       		.uleb128 0x13
+ 1880 00bb 00       		.byte	0
+ 1881 00bc 00       		.byte	0
+ 1882 00bd 0E       		.uleb128 0xe
+ 1883 00be 898201   		.uleb128 0x4109
+ 1884 00c1 01       		.byte	0x1
+ 1885 00c2 11       		.uleb128 0x11
+ 1886 00c3 01       		.uleb128 0x1
+ 1887 00c4 31       		.uleb128 0x31
+ 1888 00c5 13       		.uleb128 0x13
+ 1889 00c6 01       		.uleb128 0x1
+ 1890 00c7 13       		.uleb128 0x13
+ 1891 00c8 00       		.byte	0
+ 1892 00c9 00       		.byte	0
+ 1893 00ca 0F       		.uleb128 0xf
+ 1894 00cb 8A8201   		.uleb128 0x410a
+ 1895 00ce 00       		.byte	0
+ 1896 00cf 02       		.uleb128 0x2
+ 1897 00d0 18       		.uleb128 0x18
+ 1898 00d1 9142     		.uleb128 0x2111
+ 1899 00d3 18       		.uleb128 0x18
+ 1900 00d4 00       		.byte	0
+ 1901 00d5 00       		.byte	0
+ 1902 00d6 10       		.uleb128 0x10
+ 1903 00d7 898201   		.uleb128 0x4109
+ 1904 00da 01       		.byte	0x1
+ 1905 00db 11       		.uleb128 0x11
+ 1906 00dc 01       		.uleb128 0x1
+ 1907 00dd 31       		.uleb128 0x31
+ 1908 00de 13       		.uleb128 0x13
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 38
+
+
+ 1909 00df 00       		.byte	0
+ 1910 00e0 00       		.byte	0
+ 1911 00e1 11       		.uleb128 0x11
+ 1912 00e2 2E       		.uleb128 0x2e
+ 1913 00e3 01       		.byte	0x1
+ 1914 00e4 3F       		.uleb128 0x3f
+ 1915 00e5 19       		.uleb128 0x19
+ 1916 00e6 03       		.uleb128 0x3
+ 1917 00e7 0E       		.uleb128 0xe
+ 1918 00e8 3A       		.uleb128 0x3a
+ 1919 00e9 0B       		.uleb128 0xb
+ 1920 00ea 3B       		.uleb128 0x3b
+ 1921 00eb 0B       		.uleb128 0xb
+ 1922 00ec 27       		.uleb128 0x27
+ 1923 00ed 19       		.uleb128 0x19
+ 1924 00ee 11       		.uleb128 0x11
+ 1925 00ef 01       		.uleb128 0x1
+ 1926 00f0 12       		.uleb128 0x12
+ 1927 00f1 06       		.uleb128 0x6
+ 1928 00f2 40       		.uleb128 0x40
+ 1929 00f3 18       		.uleb128 0x18
+ 1930 00f4 9742     		.uleb128 0x2117
+ 1931 00f6 19       		.uleb128 0x19
+ 1932 00f7 01       		.uleb128 0x1
+ 1933 00f8 13       		.uleb128 0x13
+ 1934 00f9 00       		.byte	0
+ 1935 00fa 00       		.byte	0
+ 1936 00fb 12       		.uleb128 0x12
+ 1937 00fc 0F       		.uleb128 0xf
+ 1938 00fd 00       		.byte	0
+ 1939 00fe 0B       		.uleb128 0xb
+ 1940 00ff 0B       		.uleb128 0xb
+ 1941 0100 49       		.uleb128 0x49
+ 1942 0101 13       		.uleb128 0x13
+ 1943 0102 00       		.byte	0
+ 1944 0103 00       		.byte	0
+ 1945 0104 13       		.uleb128 0x13
+ 1946 0105 05       		.uleb128 0x5
+ 1947 0106 00       		.byte	0
+ 1948 0107 03       		.uleb128 0x3
+ 1949 0108 0E       		.uleb128 0xe
+ 1950 0109 3A       		.uleb128 0x3a
+ 1951 010a 0B       		.uleb128 0xb
+ 1952 010b 3B       		.uleb128 0x3b
+ 1953 010c 0B       		.uleb128 0xb
+ 1954 010d 49       		.uleb128 0x49
+ 1955 010e 13       		.uleb128 0x13
+ 1956 010f 02       		.uleb128 0x2
+ 1957 0110 18       		.uleb128 0x18
+ 1958 0111 00       		.byte	0
+ 1959 0112 00       		.byte	0
+ 1960 0113 14       		.uleb128 0x14
+ 1961 0114 05       		.uleb128 0x5
+ 1962 0115 00       		.byte	0
+ 1963 0116 03       		.uleb128 0x3
+ 1964 0117 08       		.uleb128 0x8
+ 1965 0118 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 39
+
+
+ 1966 0119 0B       		.uleb128 0xb
+ 1967 011a 3B       		.uleb128 0x3b
+ 1968 011b 0B       		.uleb128 0xb
+ 1969 011c 49       		.uleb128 0x49
+ 1970 011d 13       		.uleb128 0x13
+ 1971 011e 02       		.uleb128 0x2
+ 1972 011f 18       		.uleb128 0x18
+ 1973 0120 00       		.byte	0
+ 1974 0121 00       		.byte	0
+ 1975 0122 15       		.uleb128 0x15
+ 1976 0123 05       		.uleb128 0x5
+ 1977 0124 00       		.byte	0
+ 1978 0125 03       		.uleb128 0x3
+ 1979 0126 08       		.uleb128 0x8
+ 1980 0127 3A       		.uleb128 0x3a
+ 1981 0128 0B       		.uleb128 0xb
+ 1982 0129 3B       		.uleb128 0x3b
+ 1983 012a 0B       		.uleb128 0xb
+ 1984 012b 49       		.uleb128 0x49
+ 1985 012c 13       		.uleb128 0x13
+ 1986 012d 02       		.uleb128 0x2
+ 1987 012e 17       		.uleb128 0x17
+ 1988 012f 00       		.byte	0
+ 1989 0130 00       		.byte	0
+ 1990 0131 16       		.uleb128 0x16
+ 1991 0132 35       		.uleb128 0x35
+ 1992 0133 00       		.byte	0
+ 1993 0134 49       		.uleb128 0x49
+ 1994 0135 13       		.uleb128 0x13
+ 1995 0136 00       		.byte	0
+ 1996 0137 00       		.byte	0
+ 1997 0138 17       		.uleb128 0x17
+ 1998 0139 34       		.uleb128 0x34
+ 1999 013a 00       		.byte	0
+ 2000 013b 03       		.uleb128 0x3
+ 2001 013c 0E       		.uleb128 0xe
+ 2002 013d 3A       		.uleb128 0x3a
+ 2003 013e 0B       		.uleb128 0xb
+ 2004 013f 3B       		.uleb128 0x3b
+ 2005 0140 05       		.uleb128 0x5
+ 2006 0141 49       		.uleb128 0x49
+ 2007 0142 13       		.uleb128 0x13
+ 2008 0143 3F       		.uleb128 0x3f
+ 2009 0144 19       		.uleb128 0x19
+ 2010 0145 3C       		.uleb128 0x3c
+ 2011 0146 19       		.uleb128 0x19
+ 2012 0147 00       		.byte	0
+ 2013 0148 00       		.byte	0
+ 2014 0149 18       		.uleb128 0x18
+ 2015 014a 2E       		.uleb128 0x2e
+ 2016 014b 00       		.byte	0
+ 2017 014c 3F       		.uleb128 0x3f
+ 2018 014d 19       		.uleb128 0x19
+ 2019 014e 3C       		.uleb128 0x3c
+ 2020 014f 19       		.uleb128 0x19
+ 2021 0150 6E       		.uleb128 0x6e
+ 2022 0151 0E       		.uleb128 0xe
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 40
+
+
+ 2023 0152 03       		.uleb128 0x3
+ 2024 0153 0E       		.uleb128 0xe
+ 2025 0154 3A       		.uleb128 0x3a
+ 2026 0155 0B       		.uleb128 0xb
+ 2027 0156 3B       		.uleb128 0x3b
+ 2028 0157 05       		.uleb128 0x5
+ 2029 0158 00       		.byte	0
+ 2030 0159 00       		.byte	0
+ 2031 015a 19       		.uleb128 0x19
+ 2032 015b 2E       		.uleb128 0x2e
+ 2033 015c 00       		.byte	0
+ 2034 015d 3F       		.uleb128 0x3f
+ 2035 015e 19       		.uleb128 0x19
+ 2036 015f 3C       		.uleb128 0x3c
+ 2037 0160 19       		.uleb128 0x19
+ 2038 0161 6E       		.uleb128 0x6e
+ 2039 0162 0E       		.uleb128 0xe
+ 2040 0163 03       		.uleb128 0x3
+ 2041 0164 0E       		.uleb128 0xe
+ 2042 0165 3A       		.uleb128 0x3a
+ 2043 0166 0B       		.uleb128 0xb
+ 2044 0167 3B       		.uleb128 0x3b
+ 2045 0168 0B       		.uleb128 0xb
+ 2046 0169 00       		.byte	0
+ 2047 016a 00       		.byte	0
+ 2048 016b 00       		.byte	0
+ 2049              		.section	.debug_loc,"",%progbits
+ 2050              	.Ldebug_loc0:
+ 2051              	.LLST0:
+ 2052 0000 00000000 		.4byte	.LVL0
+ 2053 0004 09000000 		.4byte	.LVL1-1
+ 2054 0008 0100     		.2byte	0x1
+ 2055 000a 50       		.byte	0x50
+ 2056 000b 09000000 		.4byte	.LVL1-1
+ 2057 000f C4010000 		.4byte	.LFE69
+ 2058 0013 0400     		.2byte	0x4
+ 2059 0015 F3       		.byte	0xf3
+ 2060 0016 01       		.uleb128 0x1
+ 2061 0017 50       		.byte	0x50
+ 2062 0018 9F       		.byte	0x9f
+ 2063 0019 00000000 		.4byte	0
+ 2064 001d 00000000 		.4byte	0
+ 2065              	.LLST1:
+ 2066 0021 12000000 		.4byte	.LVL3
+ 2067 0025 3C000000 		.4byte	.LVL15
+ 2068 0029 0600     		.2byte	0x6
+ 2069 002b 74       		.byte	0x74
+ 2070 002c 00       		.sleb128 0
+ 2071 002d 08       		.byte	0x8
+ 2072 002e FF       		.byte	0xff
+ 2073 002f 1A       		.byte	0x1a
+ 2074 0030 9F       		.byte	0x9f
+ 2075 0031 4A000000 		.4byte	.LVL17
+ 2076 0035 50000000 		.4byte	.LVL19
+ 2077 0039 0600     		.2byte	0x6
+ 2078 003b 74       		.byte	0x74
+ 2079 003c 00       		.sleb128 0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 41
+
+
+ 2080 003d 08       		.byte	0x8
+ 2081 003e FF       		.byte	0xff
+ 2082 003f 1A       		.byte	0x1a
+ 2083 0040 9F       		.byte	0x9f
+ 2084 0041 00000000 		.4byte	0
+ 2085 0045 00000000 		.4byte	0
+ 2086              	.LLST2:
+ 2087 0049 00000000 		.4byte	.LVL71
+ 2088 004d 08000000 		.4byte	.LVL72
+ 2089 0051 0100     		.2byte	0x1
+ 2090 0053 50       		.byte	0x50
+ 2091 0054 08000000 		.4byte	.LVL72
+ 2092 0058 10000000 		.4byte	.LVL73
+ 2093 005c 0100     		.2byte	0x1
+ 2094 005e 54       		.byte	0x54
+ 2095 005f 10000000 		.4byte	.LVL73
+ 2096 0063 18000000 		.4byte	.LFE71
+ 2097 0067 0400     		.2byte	0x4
+ 2098 0069 F3       		.byte	0xf3
+ 2099 006a 01       		.uleb128 0x1
+ 2100 006b 50       		.byte	0x50
+ 2101 006c 9F       		.byte	0x9f
+ 2102 006d 00000000 		.4byte	0
+ 2103 0071 00000000 		.4byte	0
+ 2104              	.LLST3:
+ 2105 0075 00000000 		.4byte	.LVL75
+ 2106 0079 0E000000 		.4byte	.LVL76
+ 2107 007d 0100     		.2byte	0x1
+ 2108 007f 52       		.byte	0x52
+ 2109 0080 0E000000 		.4byte	.LVL76
+ 2110 0084 20000000 		.4byte	.LFE73
+ 2111 0088 0500     		.2byte	0x5
+ 2112 008a 03       		.byte	0x3
+ 2113 008b 04000000 		.4byte	threshold+4
+ 2114 008f 00000000 		.4byte	0
+ 2115 0093 00000000 		.4byte	0
+ 2116              	.LLST4:
+ 2117 0097 00000000 		.4byte	.LVL75
+ 2118 009b 1A000000 		.4byte	.LVL77
+ 2119 009f 0200     		.2byte	0x2
+ 2120 00a1 91       		.byte	0x91
+ 2121 00a2 00       		.sleb128 0
+ 2122 00a3 1A000000 		.4byte	.LVL77
+ 2123 00a7 20000000 		.4byte	.LFE73
+ 2124 00ab 0200     		.2byte	0x2
+ 2125 00ad 7D       		.byte	0x7d
+ 2126 00ae 00       		.sleb128 0
+ 2127 00af 00000000 		.4byte	0
+ 2128 00b3 00000000 		.4byte	0
+ 2129              	.LLST5:
+ 2130 00b7 00000000 		.4byte	.LVL75
+ 2131 00bb 1A000000 		.4byte	.LVL77
+ 2132 00bf 0200     		.2byte	0x2
+ 2133 00c1 91       		.byte	0x91
+ 2134 00c2 04       		.sleb128 4
+ 2135 00c3 1A000000 		.4byte	.LVL77
+ 2136 00c7 20000000 		.4byte	.LFE73
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 42
+
+
+ 2137 00cb 0200     		.2byte	0x2
+ 2138 00cd 7D       		.byte	0x7d
+ 2139 00ce 04       		.sleb128 4
+ 2140 00cf 00000000 		.4byte	0
+ 2141 00d3 00000000 		.4byte	0
+ 2142              		.section	.debug_aranges,"",%progbits
+ 2143 0000 3C000000 		.4byte	0x3c
+ 2144 0004 0200     		.2byte	0x2
+ 2145 0006 00000000 		.4byte	.Ldebug_info0
+ 2146 000a 04       		.byte	0x4
+ 2147 000b 00       		.byte	0
+ 2148 000c 0000     		.2byte	0
+ 2149 000e 0000     		.2byte	0
+ 2150 0010 00000000 		.4byte	.LFB69
+ 2151 0014 C4010000 		.4byte	.LFE69-.LFB69
+ 2152 0018 00000000 		.4byte	.LFB70
+ 2153 001c 54000000 		.4byte	.LFE70-.LFB70
+ 2154 0020 00000000 		.4byte	.LFB71
+ 2155 0024 18000000 		.4byte	.LFE71-.LFB71
+ 2156 0028 00000000 		.4byte	.LFB72
+ 2157 002c 9C000000 		.4byte	.LFE72-.LFB72
+ 2158 0030 00000000 		.4byte	.LFB73
+ 2159 0034 20000000 		.4byte	.LFE73-.LFB73
+ 2160 0038 00000000 		.4byte	0
+ 2161 003c 00000000 		.4byte	0
+ 2162              		.section	.debug_ranges,"",%progbits
+ 2163              	.Ldebug_ranges0:
+ 2164 0000 00000000 		.4byte	.LFB69
+ 2165 0004 C4010000 		.4byte	.LFE69
+ 2166 0008 00000000 		.4byte	.LFB70
+ 2167 000c 54000000 		.4byte	.LFE70
+ 2168 0010 00000000 		.4byte	.LFB71
+ 2169 0014 18000000 		.4byte	.LFE71
+ 2170 0018 00000000 		.4byte	.LFB72
+ 2171 001c 9C000000 		.4byte	.LFE72
+ 2172 0020 00000000 		.4byte	.LFB73
+ 2173 0024 20000000 		.4byte	.LFE73
+ 2174 0028 00000000 		.4byte	0
+ 2175 002c 00000000 		.4byte	0
+ 2176              		.section	.debug_line,"",%progbits
+ 2177              	.Ldebug_line0:
+ 2178 0000 27030000 		.section	.debug_str,"MS",%progbits,1
+ 2178      02007A02 
+ 2178      00000201 
+ 2178      FB0E0D00 
+ 2178      01010101 
+ 2179              	.LASF27:
+ 2180 0000 73746174 		.ascii	"statusR3\000"
+ 2180      75735233 
+ 2180      00
+ 2181              	.LASF20:
+ 2182 0009 646F7562 		.ascii	"double\000"
+ 2182      6C6500
+ 2183              	.LASF67:
+ 2184 0010 54696D65 		.ascii	"Timer_Reset_Write\000"
+ 2184      725F5265 
+ 2184      7365745F 
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 43
+
+
+ 2184      57726974 
+ 2184      6500
+ 2185              	.LASF85:
+ 2186 0022 54696D65 		.ascii	"Timer_R3_Start\000"
+ 2186      725F5233 
+ 2186      5F537461 
+ 2186      727400
+ 2187              	.LASF51:
+ 2188 0031 54696D65 		.ascii	"Timer_R1_ReadCounter\000"
+ 2188      725F5231 
+ 2188      5F526561 
+ 2188      64436F75 
+ 2188      6E746572 
+ 2189              	.LASF48:
+ 2190 0046 54696D65 		.ascii	"Timer_L1_ReadStatusRegister\000"
+ 2190      725F4C31 
+ 2190      5F526561 
+ 2190      64537461 
+ 2190      74757352 
+ 2191              	.LASF2:
+ 2192 0062 73686F72 		.ascii	"short int\000"
+ 2192      7420696E 
+ 2192      7400
+ 2193              	.LASF71:
+ 2194 006c 52325F57 		.ascii	"R2_Write\000"
+ 2194      72697465 
+ 2194      00
+ 2195              	.LASF13:
+ 2196 0075 73697A65 		.ascii	"sizetype\000"
+ 2196      74797065 
+ 2196      00
+ 2197              	.LASF63:
+ 2198 007e 54696D65 		.ascii	"Timer_R3_ReadCounter\000"
+ 2198      725F5233 
+ 2198      5F526561 
+ 2198      64436F75 
+ 2198      6E746572 
+ 2199              	.LASF23:
+ 2200 0093 5461736B 		.ascii	"TaskHandle_t\000"
+ 2200      48616E64 
+ 2200      6C655F74 
+ 2200      00
+ 2201              	.LASF38:
+ 2202 00a0 73656E73 		.ascii	"sensors\000"
+ 2202      6F727300 
+ 2203              	.LASF9:
+ 2204 00a8 6C6F6E67 		.ascii	"long long int\000"
+ 2204      206C6F6E 
+ 2204      6720696E 
+ 2204      7400
+ 2205              	.LASF7:
+ 2206 00b6 5F5F7569 		.ascii	"__uint32_t\000"
+ 2206      6E743332 
+ 2206      5F7400
+ 2207              	.LASF94:
+ 2208 00c1 5265666C 		.ascii	"ReflectanceTask\000"
+ 2208      65637461 
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 44
+
+
+ 2208      6E636554 
+ 2208      61736B00 
+ 2209              	.LASF74:
+ 2210 00d1 4C335F53 		.ascii	"L3_SetDriveMode\000"
+ 2210      65744472 
+ 2210      6976654D 
+ 2210      6F646500 
+ 2211              	.LASF4:
+ 2212 00e1 5F5F7569 		.ascii	"__uint16_t\000"
+ 2212      6E743136 
+ 2212      5F7400
+ 2213              	.LASF41:
+ 2214 00ec 5265666C 		.ascii	"ReflectanceHandle\000"
+ 2214      65637461 
+ 2214      6E636548 
+ 2214      616E646C 
+ 2214      6500
+ 2215              	.LASF60:
+ 2216 00fe 54696D65 		.ascii	"Timer_L2_ReadCounter\000"
+ 2216      725F4C32 
+ 2216      5F526561 
+ 2216      64436F75 
+ 2216      6E746572 
+ 2217              	.LASF47:
+ 2218 0113 54696D65 		.ascii	"Timer_L2_ReadStatusRegister\000"
+ 2218      725F4C32 
+ 2218      5F526561 
+ 2218      64537461 
+ 2218      74757352 
+ 2219              	.LASF25:
+ 2220 012f 73746174 		.ascii	"statusR1\000"
+ 2220      75735231 
+ 2220      00
+ 2221              	.LASF26:
+ 2222 0138 73746174 		.ascii	"statusR2\000"
+ 2222      75735232 
+ 2222      00
+ 2223              	.LASF44:
+ 2224 0141 54696D65 		.ascii	"Timer_R2_ReadStatusRegister\000"
+ 2224      725F5232 
+ 2224      5F526561 
+ 2224      64537461 
+ 2224      74757352 
+ 2225              	.LASF45:
+ 2226 015d 54696D65 		.ascii	"Timer_R3_ReadStatusRegister\000"
+ 2226      725F5233 
+ 2226      5F526561 
+ 2226      64537461 
+ 2226      74757352 
+ 2227              	.LASF50:
+ 2228 0179 54696D65 		.ascii	"Timer_R1_ReadCapture\000"
+ 2228      725F5231 
+ 2228      5F526561 
+ 2228      64436170 
+ 2228      74757265 
+ 2229              	.LASF31:
+ 2230 018e 7265666C 		.ascii	"reflectance_start\000"
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 45
+
+
+ 2230      65637461 
+ 2230      6E63655F 
+ 2230      73746172 
+ 2230      7400
+ 2231              	.LASF77:
+ 2232 01a0 4C325F57 		.ascii	"L2_Write\000"
+ 2232      72697465 
+ 2232      00
+ 2233              	.LASF19:
+ 2234 01a9 666C6F61 		.ascii	"float\000"
+ 2234      7400
+ 2235              	.LASF55:
+ 2236 01af 54696D65 		.ascii	"Timer_R2_ReadPeriod\000"
+ 2236      725F5232 
+ 2236      5F526561 
+ 2236      64506572 
+ 2236      696F6400 
+ 2237              	.LASF43:
+ 2238 01c3 54696D65 		.ascii	"Timer_R1_ReadStatusRegister\000"
+ 2238      725F5231 
+ 2238      5F526561 
+ 2238      64537461 
+ 2238      74757352 
+ 2239              	.LASF22:
+ 2240 01df 5469636B 		.ascii	"TickType_t\000"
+ 2240      54797065 
+ 2240      5F7400
+ 2241              	.LASF57:
+ 2242 01ea 54696D65 		.ascii	"Timer_R2_ReadCounter\000"
+ 2242      725F5232 
+ 2242      5F526561 
+ 2242      64436F75 
+ 2242      6E746572 
+ 2243              	.LASF35:
+ 2244 01ff 7265666C 		.ascii	"reflectance_digital\000"
+ 2244      65637461 
+ 2244      6E63655F 
+ 2244      64696769 
+ 2244      74616C00 
+ 2245              	.LASF40:
+ 2246 0213 74687265 		.ascii	"threshold\000"
+ 2246      73686F6C 
+ 2246      6400
+ 2247              	.LASF14:
+ 2248 021d 63686172 		.ascii	"char\000"
+ 2248      00
+ 2249              	.LASF61:
+ 2250 0222 54696D65 		.ascii	"Timer_R3_ReadPeriod\000"
+ 2250      725F5233 
+ 2250      5F526561 
+ 2250      64506572 
+ 2250      696F6400 
+ 2251              	.LASF6:
+ 2252 0236 6C6F6E67 		.ascii	"long int\000"
+ 2252      20696E74 
+ 2252      00
+ 2253              	.LASF34:
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 46
+
+
+ 2254 023f 76616C75 		.ascii	"values\000"
+ 2254      657300
+ 2255              	.LASF42:
+ 2256 0246 78546173 		.ascii	"xTaskGetTickCount\000"
+ 2256      6B476574 
+ 2256      5469636B 
+ 2256      436F756E 
+ 2256      7400
+ 2257              	.LASF88:
+ 2258 0258 54696D65 		.ascii	"Timer_L1_Start\000"
+ 2258      725F4C31 
+ 2258      5F537461 
+ 2258      727400
+ 2259              	.LASF1:
+ 2260 0267 756E7369 		.ascii	"unsigned char\000"
+ 2260      676E6564 
+ 2260      20636861 
+ 2260      7200
+ 2261              	.LASF54:
+ 2262 0275 54696D65 		.ascii	"Timer_L1_ReadCounter\000"
+ 2262      725F4C31 
+ 2262      5F526561 
+ 2262      64436F75 
+ 2262      6E746572 
+ 2263              	.LASF78:
+ 2264 028a 4C315F53 		.ascii	"L1_SetDriveMode\000"
+ 2264      65744472 
+ 2264      6976654D 
+ 2264      6F646500 
+ 2265              	.LASF12:
+ 2266 029a 6C6F6E67 		.ascii	"long double\000"
+ 2266      20646F75 
+ 2266      626C6500 
+ 2267              	.LASF80:
+ 2268 02a6 43794465 		.ascii	"CyDelayUs\000"
+ 2268      6C617955 
+ 2268      7300
+ 2269              	.LASF66:
+ 2270 02b0 54696D65 		.ascii	"Timer_L3_ReadCounter\000"
+ 2270      725F4C33 
+ 2270      5F526561 
+ 2270      64436F75 
+ 2270      6E746572 
+ 2271              	.LASF68:
+ 2272 02c5 52315F53 		.ascii	"R1_SetDriveMode\000"
+ 2272      65744472 
+ 2272      6976654D 
+ 2272      6F646500 
+ 2273              	.LASF37:
+ 2274 02d5 7265666C 		.ascii	"reflectance_set_threshold\000"
+ 2274      65637461 
+ 2274      6E63655F 
+ 2274      7365745F 
+ 2274      74687265 
+ 2275              	.LASF0:
+ 2276 02ef 7369676E 		.ascii	"signed char\000"
+ 2276      65642063 
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 47
+
+
+ 2276      68617200 
+ 2277              	.LASF10:
+ 2278 02fb 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2278      206C6F6E 
+ 2278      6720756E 
+ 2278      7369676E 
+ 2278      65642069 
+ 2279              	.LASF84:
+ 2280 0312 54696D65 		.ascii	"Timer_R2_Start\000"
+ 2280      725F5232 
+ 2280      5F537461 
+ 2280      727400
+ 2281              	.LASF17:
+ 2282 0321 75696E74 		.ascii	"uint32_t\000"
+ 2282      33325F74 
+ 2282      00
+ 2283              	.LASF56:
+ 2284 032a 54696D65 		.ascii	"Timer_R2_ReadCapture\000"
+ 2284      725F5232 
+ 2284      5F526561 
+ 2284      64436170 
+ 2284      74757265 
+ 2285              	.LASF11:
+ 2286 033f 756E7369 		.ascii	"unsigned int\000"
+ 2286      676E6564 
+ 2286      20696E74 
+ 2286      00
+ 2287              	.LASF15:
+ 2288 034c 75696E74 		.ascii	"uint16_t\000"
+ 2288      31365F74 
+ 2288      00
+ 2289              	.LASF69:
+ 2290 0355 52315F57 		.ascii	"R1_Write\000"
+ 2290      72697465 
+ 2290      00
+ 2291              	.LASF33:
+ 2292 035e 70765061 		.ascii	"pvParameters\000"
+ 2292      72616D65 
+ 2292      74657273 
+ 2292      00
+ 2293              	.LASF3:
+ 2294 036b 73686F72 		.ascii	"short unsigned int\000"
+ 2294      7420756E 
+ 2294      7369676E 
+ 2294      65642069 
+ 2294      6E7400
+ 2295              	.LASF90:
+ 2296 037e 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2296      43313120 
+ 2296      352E342E 
+ 2296      31203230 
+ 2296      31363036 
+ 2297 03b1 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 2297      20726576 
+ 2297      6973696F 
+ 2297      6E203233 
+ 2297      37373135 
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 48
+
+
+ 2298 03e4 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2298      66756E63 
+ 2298      74696F6E 
+ 2298      2D736563 
+ 2298      74696F6E 
+ 2299              	.LASF53:
+ 2300 040c 54696D65 		.ascii	"Timer_L1_ReadCapture\000"
+ 2300      725F4C31 
+ 2300      5F526561 
+ 2300      64436170 
+ 2300      74757265 
+ 2301              	.LASF39:
+ 2302 0421 64696769 		.ascii	"digital_sensor_value\000"
+ 2302      74616C5F 
+ 2302      73656E73 
+ 2302      6F725F76 
+ 2302      616C7565 
+ 2303              	.LASF73:
+ 2304 0436 52335F57 		.ascii	"R3_Write\000"
+ 2304      72697465 
+ 2304      00
+ 2305              	.LASF29:
+ 2306 043f 73746174 		.ascii	"statusL2\000"
+ 2306      75734C32 
+ 2306      00
+ 2307              	.LASF28:
+ 2308 0448 73746174 		.ascii	"statusL3\000"
+ 2308      75734C33 
+ 2308      00
+ 2309              	.LASF16:
+ 2310 0451 696E7433 		.ascii	"int32_t\000"
+ 2310      325F7400 
+ 2311              	.LASF21:
+ 2312 0459 55426173 		.ascii	"UBaseType_t\000"
+ 2312      65547970 
+ 2312      655F7400 
+ 2313              	.LASF65:
+ 2314 0465 54696D65 		.ascii	"Timer_L3_ReadCapture\000"
+ 2314      725F4C33 
+ 2314      5F526561 
+ 2314      64436170 
+ 2314      74757265 
+ 2315              	.LASF52:
+ 2316 047a 54696D65 		.ascii	"Timer_L1_ReadPeriod\000"
+ 2316      725F4C31 
+ 2316      5F526561 
+ 2316      64506572 
+ 2316      696F6400 
+ 2317              	.LASF89:
+ 2318 048e 78546173 		.ascii	"xTaskCreate\000"
+ 2318      6B437265 
+ 2318      61746500 
+ 2319              	.LASF86:
+ 2320 049a 54696D65 		.ascii	"Timer_L3_Start\000"
+ 2320      725F4C33 
+ 2320      5F537461 
+ 2320      727400
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 49
+
+
+ 2321              	.LASF93:
+ 2322 04a9 73656E73 		.ascii	"sensors_\000"
+ 2322      6F72735F 
+ 2322      00
+ 2323              	.LASF58:
+ 2324 04b2 54696D65 		.ascii	"Timer_L2_ReadPeriod\000"
+ 2324      725F4C32 
+ 2324      5F526561 
+ 2324      64506572 
+ 2324      696F6400 
+ 2325              	.LASF75:
+ 2326 04c6 4C335F57 		.ascii	"L3_Write\000"
+ 2326      72697465 
+ 2326      00
+ 2327              	.LASF8:
+ 2328 04cf 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2328      20756E73 
+ 2328      69676E65 
+ 2328      6420696E 
+ 2328      7400
+ 2329              	.LASF92:
+ 2330 04e1 433A5C55 		.ascii	"C:\\Users\\samue\\Desktop\\RobotRage2\\Zumo\\ZumoBo"
+ 2330      73657273 
+ 2330      5C73616D 
+ 2330      75655C44 
+ 2330      65736B74 
+ 2331 050e 742E6379 		.ascii	"t.cydsn\000"
+ 2331      64736E00 
+ 2332              	.LASF64:
+ 2333 0516 54696D65 		.ascii	"Timer_L3_ReadPeriod\000"
+ 2333      725F4C33 
+ 2333      5F526561 
+ 2333      64506572 
+ 2333      696F6400 
+ 2334              	.LASF82:
+ 2335 052a 5265666C 		.ascii	"Refl_led_Write\000"
+ 2335      5F6C6564 
+ 2335      5F577269 
+ 2335      746500
+ 2336              	.LASF36:
+ 2337 0539 64696769 		.ascii	"digital\000"
+ 2337      74616C00 
+ 2338              	.LASF49:
+ 2339 0541 54696D65 		.ascii	"Timer_R1_ReadPeriod\000"
+ 2339      725F5231 
+ 2339      5F526561 
+ 2339      64506572 
+ 2339      696F6400 
+ 2340              	.LASF62:
+ 2341 0555 54696D65 		.ascii	"Timer_R3_ReadCapture\000"
+ 2341      725F5233 
+ 2341      5F526561 
+ 2341      64436170 
+ 2341      74757265 
+ 2342              	.LASF81:
+ 2343 056a 76546173 		.ascii	"vTaskDelayUntil\000"
+ 2343      6B44656C 
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 50
+
+
+ 2343      6179556E 
+ 2343      74696C00 
+ 2344              	.LASF5:
+ 2345 057a 5F5F696E 		.ascii	"__int32_t\000"
+ 2345      7433325F 
+ 2345      7400
+ 2346              	.LASF32:
+ 2347 0584 7265666C 		.ascii	"reflectance_read\000"
+ 2347      65637461 
+ 2347      6E63655F 
+ 2347      72656164 
+ 2347      00
+ 2348              	.LASF70:
+ 2349 0595 52325F53 		.ascii	"R2_SetDriveMode\000"
+ 2349      65744472 
+ 2349      6976654D 
+ 2349      6F646500 
+ 2350              	.LASF76:
+ 2351 05a5 4C325F53 		.ascii	"L2_SetDriveMode\000"
+ 2351      65744472 
+ 2351      6976654D 
+ 2351      6F646500 
+ 2352              	.LASF18:
+ 2353 05b5 75696E74 		.ascii	"uint8\000"
+ 2353      3800
+ 2354              	.LASF30:
+ 2355 05bb 73746174 		.ascii	"statusL1\000"
+ 2355      75734C31 
+ 2355      00
+ 2356              	.LASF59:
+ 2357 05c4 54696D65 		.ascii	"Timer_L2_ReadCapture\000"
+ 2357      725F4C32 
+ 2357      5F526561 
+ 2357      64436170 
+ 2357      74757265 
+ 2358              	.LASF95:
+ 2359 05d9 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 2359      52784275 
+ 2359      66666572 
+ 2359      00
+ 2360              	.LASF24:
+ 2361 05e6 70726576 		.ascii	"prev\000"
+ 2361      00
+ 2362              	.LASF46:
+ 2363 05eb 54696D65 		.ascii	"Timer_L3_ReadStatusRegister\000"
+ 2363      725F4C33 
+ 2363      5F526561 
+ 2363      64537461 
+ 2363      74757352 
+ 2364              	.LASF91:
+ 2365 0607 5A756D6F 		.ascii	"ZumoLibrary\\Reflectance.c\000"
+ 2365      4C696272 
+ 2365      6172795C 
+ 2365      5265666C 
+ 2365      65637461 
+ 2366              	.LASF72:
+ 2367 0621 52335F53 		.ascii	"R3_SetDriveMode\000"
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccIol5QH.s 			page 51
+
+
+ 2367      65744472 
+ 2367      6976654D 
+ 2367      6F646500 
+ 2368              	.LASF87:
+ 2369 0631 54696D65 		.ascii	"Timer_L2_Start\000"
+ 2369      725F4C32 
+ 2369      5F537461 
+ 2369      727400
+ 2370              	.LASF83:
+ 2371 0640 54696D65 		.ascii	"Timer_R1_Start\000"
+ 2371      725F5231 
+ 2371      5F537461 
+ 2371      727400
+ 2372              	.LASF79:
+ 2373 064f 4C315F57 		.ascii	"L1_Write\000"
+ 2373      72697465 
+ 2373      00
+ 2374              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

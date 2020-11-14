@@ -1,0 +1,1583 @@
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"Ultra.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.UltraSonicTask,"ax",%progbits
+  20              		.align	2
+  21              		.global	UltraSonicTask
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	UltraSonicTask, %function
+  25              	UltraSonicTask:
+  26              	.LFB68:
+  27              		.file 1 "ZumoLibrary\\Ultra.c"
+   1:ZumoLibrary/Ultra.c **** /**
+   2:ZumoLibrary/Ultra.c ****  * @file    Ultra.c
+   3:ZumoLibrary/Ultra.c ****  * @brief   Basic methods for operating ultrasonic sensor. For more details, please refer to Ultra.
+   4:ZumoLibrary/Ultra.c ****  * @details part number: HC-SR04
+   5:ZumoLibrary/Ultra.c **** */
+   6:ZumoLibrary/Ultra.c **** #include "FreeRTOS.h"
+   7:ZumoLibrary/Ultra.c **** #include "task.h"
+   8:ZumoLibrary/Ultra.c **** 
+   9:ZumoLibrary/Ultra.c **** #include "project.h"
+  10:ZumoLibrary/Ultra.c **** #include <stdint.h>
+  11:ZumoLibrary/Ultra.c **** #include <stdbool.h>
+  12:ZumoLibrary/Ultra.c **** 
+  13:ZumoLibrary/Ultra.c **** #include "Ultra.h"
+  14:ZumoLibrary/Ultra.c **** 
+  15:ZumoLibrary/Ultra.c **** static TaskHandle_t UltraHandle = NULL;
+  16:ZumoLibrary/Ultra.c **** static volatile int distance;
+  17:ZumoLibrary/Ultra.c **** 
+  18:ZumoLibrary/Ultra.c **** 
+  19:ZumoLibrary/Ultra.c **** /**
+  20:ZumoLibrary/Ultra.c **** * @brief    Ultrasonic handler - called from FreeRTOS systick hook
+  21:ZumoLibrary/Ultra.c **** * @details  Counts ticks to next activation
+  22:ZumoLibrary/Ultra.c **** */
+  23:ZumoLibrary/Ultra.c **** void UltraSonicTask( void *pvParameters )
+  24:ZumoLibrary/Ultra.c **** {
+  28              		.loc 1 24 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 8
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 00B5     		push	{lr}
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 2
+
+
+  34              		.cfi_def_cfa_offset 4
+  35              		.cfi_offset 14, -4
+  36 0002 83B0     		sub	sp, sp, #12
+  37              		.cfi_def_cfa_offset 16
+  25:ZumoLibrary/Ultra.c ****     (void) pvParameters;
+  26:ZumoLibrary/Ultra.c **** 
+  27:ZumoLibrary/Ultra.c ****     TickType_t prev;
+  28:ZumoLibrary/Ultra.c ****     
+  29:ZumoLibrary/Ultra.c ****     prev = xTaskGetTickCount();
+  38              		.loc 1 29 0
+  39 0004 FFF7FEFF 		bl	xTaskGetTickCount
+  40              	.LVL1:
+  41 0008 0190     		str	r0, [sp, #4]
+  42              	.L3:
+  30:ZumoLibrary/Ultra.c ****     
+  31:ZumoLibrary/Ultra.c ****     // try to trigger every 25 ms
+  32:ZumoLibrary/Ultra.c ****     while(1) {
+  33:ZumoLibrary/Ultra.c ****         // Trigger High only if echo pulse is not active
+  34:ZumoLibrary/Ultra.c ****         if(Echo_Read() == 0) {
+  43              		.loc 1 34 0
+  44 000a FFF7FEFF 		bl	Echo_Read
+  45              	.LVL2:
+  46 000e 40B9     		cbnz	r0, .L2
+  35:ZumoLibrary/Ultra.c ****             Trig_Write(1);
+  47              		.loc 1 35 0
+  48 0010 0120     		movs	r0, #1
+  49 0012 FFF7FEFF 		bl	Trig_Write
+  50              	.LVL3:
+  36:ZumoLibrary/Ultra.c ****             vTaskDelay(1);
+  51              		.loc 1 36 0
+  52 0016 0120     		movs	r0, #1
+  53 0018 FFF7FEFF 		bl	vTaskDelay
+  54              	.LVL4:
+  37:ZumoLibrary/Ultra.c ****             Trig_Write(0);
+  55              		.loc 1 37 0
+  56 001c 0020     		movs	r0, #0
+  57 001e FFF7FEFF 		bl	Trig_Write
+  58              	.LVL5:
+  59              	.L2:
+  38:ZumoLibrary/Ultra.c ****         }
+  39:ZumoLibrary/Ultra.c ****         vTaskDelayUntil(&prev, 25);
+  60              		.loc 1 39 0
+  61 0022 1921     		movs	r1, #25
+  62 0024 01A8     		add	r0, sp, #4
+  63 0026 FFF7FEFF 		bl	vTaskDelayUntil
+  64              	.LVL6:
+  40:ZumoLibrary/Ultra.c ****     }
+  65              		.loc 1 40 0
+  66 002a EEE7     		b	.L3
+  67              		.cfi_endproc
+  68              	.LFE68:
+  69              		.size	UltraSonicTask, .-UltraSonicTask
+  70              		.section	.text.ultra_isr_handler,"ax",%progbits
+  71              		.align	2
+  72              		.global	ultra_isr_handler
+  73              		.thumb
+  74              		.thumb_func
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 3
+
+
+  75              		.type	ultra_isr_handler, %function
+  76              	ultra_isr_handler:
+  77              	.LFB69:
+  41:ZumoLibrary/Ultra.c **** }
+  42:ZumoLibrary/Ultra.c **** 
+  43:ZumoLibrary/Ultra.c **** 
+  44:ZumoLibrary/Ultra.c **** /**
+  45:ZumoLibrary/Ultra.c **** * @brief    Ultra Sonic Sensor Interrupt Handler
+  46:ZumoLibrary/Ultra.c **** * @details  Measuring reflecting time to decide distance between Zumobot and obstacle
+  47:ZumoLibrary/Ultra.c **** */
+  48:ZumoLibrary/Ultra.c **** CY_ISR(ultra_isr_handler)
+  49:ZumoLibrary/Ultra.c **** {
+  78              		.loc 1 49 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82 0000 70B5     		push	{r4, r5, r6, lr}
+  83              		.cfi_def_cfa_offset 16
+  84              		.cfi_offset 4, -16
+  85              		.cfi_offset 5, -12
+  86              		.cfi_offset 6, -8
+  87              		.cfi_offset 14, -4
+  88              	.L11:
+  50:ZumoLibrary/Ultra.c ****     static uint16_t prev;
+  51:ZumoLibrary/Ultra.c ****     static uint32_t ovf;
+  52:ZumoLibrary/Ultra.c ****     static int echo;
+  53:ZumoLibrary/Ultra.c ****     uint16_t now;
+  54:ZumoLibrary/Ultra.c ****     uint32_t status;
+  55:ZumoLibrary/Ultra.c ****     do {
+  56:ZumoLibrary/Ultra.c ****         status = Timer_ReadStatusRegister();
+  89              		.loc 1 56 0
+  90 0002 FFF7FEFF 		bl	Timer_ReadStatusRegister
+  91              	.LVL7:
+  92 0006 0446     		mov	r4, r0
+  93              	.LVL8:
+  94 0008 00F00803 		and	r3, r0, #8
+  57:ZumoLibrary/Ultra.c ****         if(status & Timer_STATUS_FIFONEMP) {
+  95              		.loc 1 57 0
+  96 000c 03F0FF05 		and	r5, r3, #255
+  97 0010 0BB3     		cbz	r3, .L6
+  58:ZumoLibrary/Ultra.c ****             now = Timer_ReadCapture();
+  98              		.loc 1 58 0
+  99 0012 FFF7FEFF 		bl	Timer_ReadCapture
+ 100              	.LVL9:
+ 101 0016 0646     		mov	r6, r0
+ 102              	.LVL10:
+  59:ZumoLibrary/Ultra.c ****             if(Echo_Read() == 0) {
+ 103              		.loc 1 59 0
+ 104 0018 FFF7FEFF 		bl	Echo_Read
+ 105              	.LVL11:
+ 106 001c A0B9     		cbnz	r0, .L7
+ 107              	.LBB2:
+  60:ZumoLibrary/Ultra.c ****                 uint16_t time = prev - now;
+ 108              		.loc 1 60 0
+ 109 001e 134A     		ldr	r2, .L13
+ 110 0020 1388     		ldrh	r3, [r2]
+ 111 0022 9B1B     		subs	r3, r3, r6
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 4
+
+
+ 112 0024 9BB2     		uxth	r3, r3
+ 113              	.LVL12:
+  61:ZumoLibrary/Ultra.c ****                 if(echo == 1 && ovf <= 1) {
+ 114              		.loc 1 61 0
+ 115 0026 5268     		ldr	r2, [r2, #4]
+ 116 0028 012A     		cmp	r2, #1
+ 117 002a 09D1     		bne	.L8
+ 118              		.loc 1 61 0 is_stmt 0 discriminator 1
+ 119 002c 0F4A     		ldr	r2, .L13
+ 120 002e 9268     		ldr	r2, [r2, #8]
+ 121 0030 012A     		cmp	r2, #1
+ 122 0032 05D8     		bhi	.L8
+  62:ZumoLibrary/Ultra.c ****                     distance = time / 58;
+ 123              		.loc 1 62 0 is_stmt 1
+ 124 0034 0E4A     		ldr	r2, .L13+4
+ 125 0036 A2FB0323 		umull	r2, r3, r2, r3
+ 126              	.LVL13:
+ 127 003a 5B09     		lsrs	r3, r3, #5
+ 128 003c 0B4A     		ldr	r2, .L13
+ 129 003e D360     		str	r3, [r2, #12]
+ 130              	.L8:
+  63:ZumoLibrary/Ultra.c ****                 }
+  64:ZumoLibrary/Ultra.c ****                 echo = 0;
+ 131              		.loc 1 64 0
+ 132 0040 0022     		movs	r2, #0
+ 133 0042 0A4B     		ldr	r3, .L13
+ 134 0044 5A60     		str	r2, [r3, #4]
+ 135              	.LBE2:
+ 136 0046 02E0     		b	.L9
+ 137              	.LVL14:
+ 138              	.L7:
+  65:ZumoLibrary/Ultra.c **** #if 0                
+  66:ZumoLibrary/Ultra.c ****                 // for visual debugging of overly long pulse
+  67:ZumoLibrary/Ultra.c ****                 if(ovf > 1) {
+  68:ZumoLibrary/Ultra.c ****                     BatteryLed_Write(!BatteryLed_Read());
+  69:ZumoLibrary/Ultra.c ****                 }
+  70:ZumoLibrary/Ultra.c **** #endif                
+  71:ZumoLibrary/Ultra.c ****             }
+  72:ZumoLibrary/Ultra.c ****             else {
+  73:ZumoLibrary/Ultra.c ****                 echo = 1;
+ 139              		.loc 1 73 0
+ 140 0048 0122     		movs	r2, #1
+ 141 004a 084B     		ldr	r3, .L13
+ 142 004c 5A60     		str	r2, [r3, #4]
+ 143              	.L9:
+  74:ZumoLibrary/Ultra.c ****             }
+  75:ZumoLibrary/Ultra.c ****             prev = now;
+ 144              		.loc 1 75 0
+ 145 004e 074B     		ldr	r3, .L13
+ 146 0050 1E80     		strh	r6, [r3]	@ movhi
+  76:ZumoLibrary/Ultra.c ****             ovf = 0;
+ 147              		.loc 1 76 0
+ 148 0052 0022     		movs	r2, #0
+ 149 0054 9A60     		str	r2, [r3, #8]
+ 150              	.LVL15:
+ 151              	.L6:
+  77:ZumoLibrary/Ultra.c ****         }
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 5
+
+
+  78:ZumoLibrary/Ultra.c ****         if(status & Timer_STATUS_TC) {
+ 152              		.loc 1 78 0
+ 153 0056 14F0010F 		tst	r4, #1
+ 154 005a 03D0     		beq	.L10
+  79:ZumoLibrary/Ultra.c ****             ++ovf; // used to count overly long pulses
+ 155              		.loc 1 79 0
+ 156 005c 034A     		ldr	r2, .L13
+ 157 005e 9368     		ldr	r3, [r2, #8]
+ 158 0060 0133     		adds	r3, r3, #1
+ 159 0062 9360     		str	r3, [r2, #8]
+ 160              	.L10:
+  80:ZumoLibrary/Ultra.c ****         }
+  81:ZumoLibrary/Ultra.c ****     } while(status & Timer_STATUS_FIFONEMP);
+ 161              		.loc 1 81 0
+ 162 0064 002D     		cmp	r5, #0
+ 163 0066 CCD1     		bne	.L11
+  82:ZumoLibrary/Ultra.c **** }
+ 164              		.loc 1 82 0
+ 165 0068 70BD     		pop	{r4, r5, r6, pc}
+ 166              	.L14:
+ 167 006a 00BF     		.align	2
+ 168              	.L13:
+ 169 006c 00000000 		.word	.LANCHOR0
+ 170 0070 09CB3D8D 		.word	-1925330167
+ 171              		.cfi_endproc
+ 172              	.LFE69:
+ 173              		.size	ultra_isr_handler, .-ultra_isr_handler
+ 174              		.section	.text.Ultra_Start,"ax",%progbits
+ 175              		.align	2
+ 176              		.global	Ultra_Start
+ 177              		.thumb
+ 178              		.thumb_func
+ 179              		.type	Ultra_Start, %function
+ 180              	Ultra_Start:
+ 181              	.LFB70:
+  83:ZumoLibrary/Ultra.c **** 
+  84:ZumoLibrary/Ultra.c **** 
+  85:ZumoLibrary/Ultra.c **** /**
+  86:ZumoLibrary/Ultra.c **** * @brief    Starting Ultra Sonic Sensor
+  87:ZumoLibrary/Ultra.c **** * @details  
+  88:ZumoLibrary/Ultra.c **** */
+  89:ZumoLibrary/Ultra.c **** void Ultra_Start()
+  90:ZumoLibrary/Ultra.c **** {
+ 182              		.loc 1 90 0
+ 183              		.cfi_startproc
+ 184              		@ args = 0, pretend = 0, frame = 0
+ 185              		@ frame_needed = 0, uses_anonymous_args = 0
+  91:ZumoLibrary/Ultra.c ****     if(UltraHandle == NULL) {
+ 186              		.loc 1 91 0
+ 187 0000 0B4B     		ldr	r3, .L19
+ 188 0002 1B69     		ldr	r3, [r3, #16]
+ 189 0004 9BB9     		cbnz	r3, .L18
+  90:ZumoLibrary/Ultra.c ****     if(UltraHandle == NULL) {
+ 190              		.loc 1 90 0
+ 191 0006 00B5     		push	{lr}
+ 192              		.cfi_def_cfa_offset 4
+ 193              		.cfi_offset 14, -4
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 6
+
+
+ 194 0008 83B0     		sub	sp, sp, #12
+ 195              		.cfi_def_cfa_offset 16
+  92:ZumoLibrary/Ultra.c ****         ultra_isr_StartEx(ultra_isr_handler);               // Start ultra sonic interrupt
+ 196              		.loc 1 92 0
+ 197 000a 0A48     		ldr	r0, .L19+4
+ 198 000c FFF7FEFF 		bl	ultra_isr_StartEx
+ 199              	.LVL16:
+  93:ZumoLibrary/Ultra.c ****         Timer_Start();                                      // Start Echo pulse capture timer
+ 200              		.loc 1 93 0
+ 201 0010 FFF7FEFF 		bl	Timer_Start
+ 202              	.LVL17:
+  94:ZumoLibrary/Ultra.c ****         // task runs at highest priority but sleeps most of the time
+  95:ZumoLibrary/Ultra.c ****         xTaskCreate( UltraSonicTask, "Ultra", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3,
+ 203              		.loc 1 95 0
+ 204 0014 084B     		ldr	r3, .L19+8
+ 205 0016 0193     		str	r3, [sp, #4]
+ 206 0018 0323     		movs	r3, #3
+ 207 001a 0093     		str	r3, [sp]
+ 208 001c 0023     		movs	r3, #0
+ 209 001e 6422     		movs	r2, #100
+ 210 0020 0649     		ldr	r1, .L19+12
+ 211 0022 0748     		ldr	r0, .L19+16
+ 212 0024 FFF7FEFF 		bl	xTaskCreate
+ 213              	.LVL18:
+  96:ZumoLibrary/Ultra.c ****     }
+  97:ZumoLibrary/Ultra.c **** }
+ 214              		.loc 1 97 0
+ 215 0028 03B0     		add	sp, sp, #12
+ 216              		.cfi_def_cfa_offset 4
+ 217              		@ sp needed
+ 218 002a 5DF804FB 		ldr	pc, [sp], #4
+ 219              	.L18:
+ 220              		.cfi_def_cfa_offset 0
+ 221              		.cfi_restore 14
+ 222 002e 7047     		bx	lr
+ 223              	.L20:
+ 224              		.align	2
+ 225              	.L19:
+ 226 0030 00000000 		.word	.LANCHOR0
+ 227 0034 00000000 		.word	ultra_isr_handler
+ 228 0038 10000000 		.word	.LANCHOR0+16
+ 229 003c 00000000 		.word	.LC0
+ 230 0040 00000000 		.word	UltraSonicTask
+ 231              		.cfi_endproc
+ 232              	.LFE70:
+ 233              		.size	Ultra_Start, .-Ultra_Start
+ 234              		.section	.text.Ultra_GetDistance,"ax",%progbits
+ 235              		.align	2
+ 236              		.global	Ultra_GetDistance
+ 237              		.thumb
+ 238              		.thumb_func
+ 239              		.type	Ultra_GetDistance, %function
+ 240              	Ultra_GetDistance:
+ 241              	.LFB71:
+  98:ZumoLibrary/Ultra.c **** 
+  99:ZumoLibrary/Ultra.c **** int Ultra_GetDistance(void)
+ 100:ZumoLibrary/Ultra.c **** {
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 7
+
+
+ 242              		.loc 1 100 0
+ 243              		.cfi_startproc
+ 244              		@ args = 0, pretend = 0, frame = 0
+ 245              		@ frame_needed = 0, uses_anonymous_args = 0
+ 246              		@ link register save eliminated.
+ 101:ZumoLibrary/Ultra.c ****     return distance;       
+ 247              		.loc 1 101 0
+ 248 0000 014B     		ldr	r3, .L22
+ 249 0002 D868     		ldr	r0, [r3, #12]
+ 102:ZumoLibrary/Ultra.c **** }    
+ 250              		.loc 1 102 0
+ 251 0004 7047     		bx	lr
+ 252              	.L23:
+ 253 0006 00BF     		.align	2
+ 254              	.L22:
+ 255 0008 00000000 		.word	.LANCHOR0
+ 256              		.cfi_endproc
+ 257              	.LFE71:
+ 258              		.size	Ultra_GetDistance, .-Ultra_GetDistance
+ 259              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 260              		.align	2
+ 261              	.LC0:
+ 262 0000 556C7472 		.ascii	"Ultra\000"
+ 262      6100
+ 263              		.bss
+ 264              		.align	2
+ 265              		.set	.LANCHOR0,. + 0
+ 266              		.type	prev.7509, %object
+ 267              		.size	prev.7509, 2
+ 268              	prev.7509:
+ 269 0000 0000     		.space	2
+ 270 0002 0000     		.space	2
+ 271              		.type	echo.7511, %object
+ 272              		.size	echo.7511, 4
+ 273              	echo.7511:
+ 274 0004 00000000 		.space	4
+ 275              		.type	ovf.7510, %object
+ 276              		.size	ovf.7510, 4
+ 277              	ovf.7510:
+ 278 0008 00000000 		.space	4
+ 279              		.type	distance, %object
+ 280              		.size	distance, 4
+ 281              	distance:
+ 282 000c 00000000 		.space	4
+ 283              		.type	UltraHandle, %object
+ 284              		.size	UltraHandle, 4
+ 285              	UltraHandle:
+ 286 0010 00000000 		.space	4
+ 287              		.text
+ 288              	.Letext0:
+ 289              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 290              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 291              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 292              		.file 5 "..\\FreeRTOS\\Source\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 293              		.file 6 "..\\FreeRTOS\\Source\\include/task.h"
+ 294              		.file 7 "Generated_Source\\PSoC5/Echo.h"
+ 295              		.file 8 "Generated_Source\\PSoC5/Trig.h"
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 8
+
+
+ 296              		.file 9 "Generated_Source\\PSoC5/Timer.h"
+ 297              		.file 10 "Generated_Source\\PSoC5/ultra_isr.h"
+ 298              		.file 11 "Generated_Source\\PSoC5/core_cm3.h"
+ 299              		.section	.debug_info,"",%progbits
+ 300              	.Ldebug_info0:
+ 301 0000 5A030000 		.4byte	0x35a
+ 302 0004 0400     		.2byte	0x4
+ 303 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 304 000a 04       		.byte	0x4
+ 305 000b 01       		.uleb128 0x1
+ 306 000c 96000000 		.4byte	.LASF40
+ 307 0010 0C       		.byte	0xc
+ 308 0011 B9020000 		.4byte	.LASF41
+ 309 0015 78020000 		.4byte	.LASF42
+ 310 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 311 001d 00000000 		.4byte	0
+ 312 0021 00000000 		.4byte	.Ldebug_line0
+ 313 0025 02       		.uleb128 0x2
+ 314 0026 04       		.byte	0x4
+ 315 0027 05       		.byte	0x5
+ 316 0028 696E7400 		.ascii	"int\000"
+ 317 002c 03       		.uleb128 0x3
+ 318 002d 04       		.byte	0x4
+ 319 002e 07       		.byte	0x7
+ 320 002f 9D010000 		.4byte	.LASF0
+ 321 0033 03       		.uleb128 0x3
+ 322 0034 08       		.byte	0x8
+ 323 0035 05       		.byte	0x5
+ 324 0036 D9010000 		.4byte	.LASF1
+ 325 003a 03       		.uleb128 0x3
+ 326 003b 08       		.byte	0x8
+ 327 003c 04       		.byte	0x4
+ 328 003d 6C020000 		.4byte	.LASF2
+ 329 0041 03       		.uleb128 0x3
+ 330 0042 01       		.byte	0x1
+ 331 0043 06       		.byte	0x6
+ 332 0044 AD020000 		.4byte	.LASF3
+ 333 0048 03       		.uleb128 0x3
+ 334 0049 01       		.byte	0x1
+ 335 004a 08       		.byte	0x8
+ 336 004b 66010000 		.4byte	.LASF4
+ 337 004f 03       		.uleb128 0x3
+ 338 0050 02       		.byte	0x2
+ 339 0051 05       		.byte	0x5
+ 340 0052 1D020000 		.4byte	.LASF5
+ 341 0056 04       		.uleb128 0x4
+ 342 0057 74010000 		.4byte	.LASF7
+ 343 005b 02       		.byte	0x2
+ 344 005c 2B       		.byte	0x2b
+ 345 005d 61000000 		.4byte	0x61
+ 346 0061 03       		.uleb128 0x3
+ 347 0062 02       		.byte	0x2
+ 348 0063 07       		.byte	0x7
+ 349 0064 36010000 		.4byte	.LASF6
+ 350 0068 04       		.uleb128 0x4
+ 351 0069 28000000 		.4byte	.LASF8
+ 352 006d 02       		.byte	0x2
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 9
+
+
+ 353 006e 3F       		.byte	0x3f
+ 354 006f 73000000 		.4byte	0x73
+ 355 0073 03       		.uleb128 0x3
+ 356 0074 04       		.byte	0x4
+ 357 0075 05       		.byte	0x5
+ 358 0076 58020000 		.4byte	.LASF9
+ 359 007a 04       		.uleb128 0x4
+ 360 007b 86010000 		.4byte	.LASF10
+ 361 007f 02       		.byte	0x2
+ 362 0080 41       		.byte	0x41
+ 363 0081 85000000 		.4byte	0x85
+ 364 0085 03       		.uleb128 0x3
+ 365 0086 04       		.byte	0x4
+ 366 0087 07       		.byte	0x7
+ 367 0088 24010000 		.4byte	.LASF11
+ 368 008c 03       		.uleb128 0x3
+ 369 008d 08       		.byte	0x8
+ 370 008e 07       		.byte	0x7
+ 371 008f B4010000 		.4byte	.LASF12
+ 372 0093 04       		.uleb128 0x4
+ 373 0094 27020000 		.4byte	.LASF13
+ 374 0098 03       		.byte	0x3
+ 375 0099 24       		.byte	0x24
+ 376 009a 56000000 		.4byte	0x56
+ 377 009e 04       		.uleb128 0x4
+ 378 009f 61000000 		.4byte	.LASF14
+ 379 00a3 03       		.byte	0x3
+ 380 00a4 2C       		.byte	0x2c
+ 381 00a5 68000000 		.4byte	0x68
+ 382 00a9 04       		.uleb128 0x4
+ 383 00aa 4F020000 		.4byte	.LASF15
+ 384 00ae 03       		.byte	0x3
+ 385 00af 30       		.byte	0x30
+ 386 00b0 7A000000 		.4byte	0x7a
+ 387 00b4 05       		.uleb128 0x5
+ 388 00b5 78000000 		.4byte	.LASF16
+ 389 00b9 04       		.byte	0x4
+ 390 00ba E401     		.2byte	0x1e4
+ 391 00bc 48000000 		.4byte	0x48
+ 392 00c0 03       		.uleb128 0x3
+ 393 00c1 04       		.byte	0x4
+ 394 00c2 04       		.byte	0x4
+ 395 00c3 72000000 		.4byte	.LASF17
+ 396 00c7 03       		.uleb128 0x3
+ 397 00c8 08       		.byte	0x8
+ 398 00c9 04       		.byte	0x4
+ 399 00ca 7F010000 		.4byte	.LASF18
+ 400 00ce 03       		.uleb128 0x3
+ 401 00cf 01       		.byte	0x1
+ 402 00d0 08       		.byte	0x8
+ 403 00d1 F9010000 		.4byte	.LASF19
+ 404 00d5 03       		.uleb128 0x3
+ 405 00d6 04       		.byte	0x4
+ 406 00d7 07       		.byte	0x7
+ 407 00d8 D0010000 		.4byte	.LASF20
+ 408 00dc 06       		.uleb128 0x6
+ 409 00dd 04       		.byte	0x4
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 10
+
+
+ 410 00de 04       		.uleb128 0x4
+ 411 00df DF020000 		.4byte	.LASF21
+ 412 00e3 05       		.byte	0x5
+ 413 00e4 39       		.byte	0x39
+ 414 00e5 85000000 		.4byte	0x85
+ 415 00e9 04       		.uleb128 0x4
+ 416 00ea 1D000000 		.4byte	.LASF22
+ 417 00ee 05       		.byte	0x5
+ 418 00ef 3F       		.byte	0x3f
+ 419 00f0 A9000000 		.4byte	0xa9
+ 420 00f4 04       		.uleb128 0x4
+ 421 00f5 42020000 		.4byte	.LASF23
+ 422 00f9 06       		.byte	0x6
+ 423 00fa 3D       		.byte	0x3d
+ 424 00fb DC000000 		.4byte	0xdc
+ 425 00ff 07       		.uleb128 0x7
+ 426 0100 4B000000 		.4byte	.LASF43
+ 427 0104 01       		.byte	0x1
+ 428 0105 17       		.byte	0x17
+ 429 0106 00000000 		.4byte	.LFB68
+ 430 010a 2C000000 		.4byte	.LFE68-.LFB68
+ 431 010e 01       		.uleb128 0x1
+ 432 010f 9C       		.byte	0x9c
+ 433 0110 92010000 		.4byte	0x192
+ 434 0114 08       		.uleb128 0x8
+ 435 0115 FE010000 		.4byte	.LASF44
+ 436 0119 01       		.byte	0x1
+ 437 011a 17       		.byte	0x17
+ 438 011b DC000000 		.4byte	0xdc
+ 439 011f 00000000 		.4byte	.LLST0
+ 440 0123 09       		.uleb128 0x9
+ 441 0124 F0020000 		.4byte	.LASF24
+ 442 0128 01       		.byte	0x1
+ 443 0129 1B       		.byte	0x1b
+ 444 012a E9000000 		.4byte	0xe9
+ 445 012e 02       		.uleb128 0x2
+ 446 012f 91       		.byte	0x91
+ 447 0130 74       		.sleb128 -12
+ 448 0131 0A       		.uleb128 0xa
+ 449 0132 08000000 		.4byte	.LVL1
+ 450 0136 EB020000 		.4byte	0x2eb
+ 451 013a 0A       		.uleb128 0xa
+ 452 013b 0E000000 		.4byte	.LVL2
+ 453 013f F7020000 		.4byte	0x2f7
+ 454 0143 0B       		.uleb128 0xb
+ 455 0144 16000000 		.4byte	.LVL3
+ 456 0148 02030000 		.4byte	0x302
+ 457 014c 56010000 		.4byte	0x156
+ 458 0150 0C       		.uleb128 0xc
+ 459 0151 01       		.uleb128 0x1
+ 460 0152 50       		.byte	0x50
+ 461 0153 01       		.uleb128 0x1
+ 462 0154 31       		.byte	0x31
+ 463 0155 00       		.byte	0
+ 464 0156 0B       		.uleb128 0xb
+ 465 0157 1C000000 		.4byte	.LVL4
+ 466 015b 0D030000 		.4byte	0x30d
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 11
+
+
+ 467 015f 69010000 		.4byte	0x169
+ 468 0163 0C       		.uleb128 0xc
+ 469 0164 01       		.uleb128 0x1
+ 470 0165 50       		.byte	0x50
+ 471 0166 01       		.uleb128 0x1
+ 472 0167 31       		.byte	0x31
+ 473 0168 00       		.byte	0
+ 474 0169 0B       		.uleb128 0xb
+ 475 016a 22000000 		.4byte	.LVL5
+ 476 016e 02030000 		.4byte	0x302
+ 477 0172 7C010000 		.4byte	0x17c
+ 478 0176 0C       		.uleb128 0xc
+ 479 0177 01       		.uleb128 0x1
+ 480 0178 50       		.byte	0x50
+ 481 0179 01       		.uleb128 0x1
+ 482 017a 30       		.byte	0x30
+ 483 017b 00       		.byte	0
+ 484 017c 0D       		.uleb128 0xd
+ 485 017d 2A000000 		.4byte	.LVL6
+ 486 0181 19030000 		.4byte	0x319
+ 487 0185 0C       		.uleb128 0xc
+ 488 0186 01       		.uleb128 0x1
+ 489 0187 50       		.byte	0x50
+ 490 0188 02       		.uleb128 0x2
+ 491 0189 91       		.byte	0x91
+ 492 018a 74       		.sleb128 -12
+ 493 018b 0C       		.uleb128 0xc
+ 494 018c 01       		.uleb128 0x1
+ 495 018d 51       		.byte	0x51
+ 496 018e 01       		.uleb128 0x1
+ 497 018f 49       		.byte	0x49
+ 498 0190 00       		.byte	0
+ 499 0191 00       		.byte	0
+ 500 0192 0E       		.uleb128 0xe
+ 501 0193 0B000000 		.4byte	.LASF45
+ 502 0197 01       		.byte	0x1
+ 503 0198 30       		.byte	0x30
+ 504 0199 00000000 		.4byte	.LFB69
+ 505 019d 74000000 		.4byte	.LFE69-.LFB69
+ 506 01a1 01       		.uleb128 0x1
+ 507 01a2 9C       		.byte	0x9c
+ 508 01a3 31020000 		.4byte	0x231
+ 509 01a7 09       		.uleb128 0x9
+ 510 01a8 F0020000 		.4byte	.LASF24
+ 511 01ac 01       		.byte	0x1
+ 512 01ad 32       		.byte	0x32
+ 513 01ae 93000000 		.4byte	0x93
+ 514 01b2 05       		.uleb128 0x5
+ 515 01b3 03       		.byte	0x3
+ 516 01b4 00000000 		.4byte	prev.7509
+ 517 01b8 0F       		.uleb128 0xf
+ 518 01b9 6F766600 		.ascii	"ovf\000"
+ 519 01bd 01       		.byte	0x1
+ 520 01be 33       		.byte	0x33
+ 521 01bf A9000000 		.4byte	0xa9
+ 522 01c3 05       		.uleb128 0x5
+ 523 01c4 03       		.byte	0x3
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 12
+
+
+ 524 01c5 08000000 		.4byte	ovf.7510
+ 525 01c9 09       		.uleb128 0x9
+ 526 01ca EB020000 		.4byte	.LASF25
+ 527 01ce 01       		.byte	0x1
+ 528 01cf 34       		.byte	0x34
+ 529 01d0 25000000 		.4byte	0x25
+ 530 01d4 05       		.uleb128 0x5
+ 531 01d5 03       		.byte	0x3
+ 532 01d6 04000000 		.4byte	echo.7511
+ 533 01da 10       		.uleb128 0x10
+ 534 01db 6E6F7700 		.ascii	"now\000"
+ 535 01df 01       		.byte	0x1
+ 536 01e0 35       		.byte	0x35
+ 537 01e1 93000000 		.4byte	0x93
+ 538 01e5 21000000 		.4byte	.LLST1
+ 539 01e9 11       		.uleb128 0x11
+ 540 01ea 5A000000 		.4byte	.LASF26
+ 541 01ee 01       		.byte	0x1
+ 542 01ef 36       		.byte	0x36
+ 543 01f0 A9000000 		.4byte	0xa9
+ 544 01f4 34000000 		.4byte	.LLST2
+ 545 01f8 12       		.uleb128 0x12
+ 546 01f9 1E000000 		.4byte	.LBB2
+ 547 01fd 28000000 		.4byte	.LBE2-.LBB2
+ 548 0201 15020000 		.4byte	0x215
+ 549 0205 11       		.uleb128 0x11
+ 550 0206 CB010000 		.4byte	.LASF27
+ 551 020a 01       		.byte	0x1
+ 552 020b 3C       		.byte	0x3c
+ 553 020c 93000000 		.4byte	0x93
+ 554 0210 4C000000 		.4byte	.LLST3
+ 555 0214 00       		.byte	0
+ 556 0215 0A       		.uleb128 0xa
+ 557 0216 06000000 		.4byte	.LVL7
+ 558 021a 25030000 		.4byte	0x325
+ 559 021e 0A       		.uleb128 0xa
+ 560 021f 16000000 		.4byte	.LVL9
+ 561 0223 30030000 		.4byte	0x330
+ 562 0227 0A       		.uleb128 0xa
+ 563 0228 1C000000 		.4byte	.LVL11
+ 564 022c F7020000 		.4byte	0x2f7
+ 565 0230 00       		.byte	0
+ 566 0231 13       		.uleb128 0x13
+ 567 0232 91010000 		.4byte	.LASF46
+ 568 0236 01       		.byte	0x1
+ 569 0237 59       		.byte	0x59
+ 570 0238 00000000 		.4byte	.LFB70
+ 571 023c 44000000 		.4byte	.LFE70-.LFB70
+ 572 0240 01       		.uleb128 0x1
+ 573 0241 9C       		.byte	0x9c
+ 574 0242 9E020000 		.4byte	0x29e
+ 575 0246 0B       		.uleb128 0xb
+ 576 0247 10000000 		.4byte	.LVL16
+ 577 024b 3B030000 		.4byte	0x33b
+ 578 024f 5D020000 		.4byte	0x25d
+ 579 0253 0C       		.uleb128 0xc
+ 580 0254 01       		.uleb128 0x1
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 13
+
+
+ 581 0255 50       		.byte	0x50
+ 582 0256 05       		.uleb128 0x5
+ 583 0257 03       		.byte	0x3
+ 584 0258 00000000 		.4byte	ultra_isr_handler
+ 585 025c 00       		.byte	0
+ 586 025d 0A       		.uleb128 0xa
+ 587 025e 14000000 		.4byte	.LVL17
+ 588 0262 46030000 		.4byte	0x346
+ 589 0266 0D       		.uleb128 0xd
+ 590 0267 28000000 		.4byte	.LVL18
+ 591 026b 51030000 		.4byte	0x351
+ 592 026f 0C       		.uleb128 0xc
+ 593 0270 01       		.uleb128 0x1
+ 594 0271 50       		.byte	0x50
+ 595 0272 05       		.uleb128 0x5
+ 596 0273 03       		.byte	0x3
+ 597 0274 00000000 		.4byte	UltraSonicTask
+ 598 0278 0C       		.uleb128 0xc
+ 599 0279 01       		.uleb128 0x1
+ 600 027a 51       		.byte	0x51
+ 601 027b 05       		.uleb128 0x5
+ 602 027c 03       		.byte	0x3
+ 603 027d 00000000 		.4byte	.LC0
+ 604 0281 0C       		.uleb128 0xc
+ 605 0282 01       		.uleb128 0x1
+ 606 0283 52       		.byte	0x52
+ 607 0284 02       		.uleb128 0x2
+ 608 0285 08       		.byte	0x8
+ 609 0286 64       		.byte	0x64
+ 610 0287 0C       		.uleb128 0xc
+ 611 0288 01       		.uleb128 0x1
+ 612 0289 53       		.byte	0x53
+ 613 028a 01       		.uleb128 0x1
+ 614 028b 30       		.byte	0x30
+ 615 028c 0C       		.uleb128 0xc
+ 616 028d 02       		.uleb128 0x2
+ 617 028e 7D       		.byte	0x7d
+ 618 028f 00       		.sleb128 0
+ 619 0290 01       		.uleb128 0x1
+ 620 0291 33       		.byte	0x33
+ 621 0292 0C       		.uleb128 0xc
+ 622 0293 02       		.uleb128 0x2
+ 623 0294 7D       		.byte	0x7d
+ 624 0295 04       		.sleb128 4
+ 625 0296 05       		.uleb128 0x5
+ 626 0297 03       		.byte	0x3
+ 627 0298 10000000 		.4byte	.LANCHOR0+16
+ 628 029c 00       		.byte	0
+ 629 029d 00       		.byte	0
+ 630 029e 14       		.uleb128 0x14
+ 631 029f CD020000 		.4byte	.LASF47
+ 632 02a3 01       		.byte	0x1
+ 633 02a4 63       		.byte	0x63
+ 634 02a5 25000000 		.4byte	0x25
+ 635 02a9 00000000 		.4byte	.LFB71
+ 636 02ad 0C000000 		.4byte	.LFE71-.LFB71
+ 637 02b1 01       		.uleb128 0x1
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 14
+
+
+ 638 02b2 9C       		.byte	0x9c
+ 639 02b3 09       		.uleb128 0x9
+ 640 02b4 8A000000 		.4byte	.LASF28
+ 641 02b8 01       		.byte	0x1
+ 642 02b9 0F       		.byte	0xf
+ 643 02ba F4000000 		.4byte	0xf4
+ 644 02be 05       		.uleb128 0x5
+ 645 02bf 03       		.byte	0x3
+ 646 02c0 10000000 		.4byte	UltraHandle
+ 647 02c4 09       		.uleb128 0x9
+ 648 02c5 69000000 		.4byte	.LASF29
+ 649 02c9 01       		.byte	0x1
+ 650 02ca 10       		.byte	0x10
+ 651 02cb D5020000 		.4byte	0x2d5
+ 652 02cf 05       		.uleb128 0x5
+ 653 02d0 03       		.byte	0x3
+ 654 02d1 0C000000 		.4byte	distance
+ 655 02d5 15       		.uleb128 0x15
+ 656 02d6 25000000 		.4byte	0x25
+ 657 02da 16       		.uleb128 0x16
+ 658 02db 59010000 		.4byte	.LASF48
+ 659 02df 0B       		.byte	0xb
+ 660 02e0 1207     		.2byte	0x712
+ 661 02e2 E6020000 		.4byte	0x2e6
+ 662 02e6 15       		.uleb128 0x15
+ 663 02e7 9E000000 		.4byte	0x9e
+ 664 02eb 17       		.uleb128 0x17
+ 665 02ec 0B020000 		.4byte	.LASF30
+ 666 02f0 0B020000 		.4byte	.LASF30
+ 667 02f4 06       		.byte	0x6
+ 668 02f5 3E05     		.2byte	0x53e
+ 669 02f7 18       		.uleb128 0x18
+ 670 02f8 AA010000 		.4byte	.LASF31
+ 671 02fc AA010000 		.4byte	.LASF31
+ 672 0300 07       		.byte	0x7
+ 673 0301 29       		.byte	0x29
+ 674 0302 18       		.uleb128 0x18
+ 675 0303 00000000 		.4byte	.LASF32
+ 676 0307 00000000 		.4byte	.LASF32
+ 677 030b 08       		.byte	0x8
+ 678 030c 26       		.byte	0x26
+ 679 030d 17       		.uleb128 0x17
+ 680 030e 61020000 		.4byte	.LASF33
+ 681 0312 61020000 		.4byte	.LASF33
+ 682 0316 06       		.byte	0x6
+ 683 0317 ED02     		.2byte	0x2ed
+ 684 0319 17       		.uleb128 0x17
+ 685 031a 49010000 		.4byte	.LASF34
+ 686 031e 49010000 		.4byte	.LASF34
+ 687 0322 06       		.byte	0x6
+ 688 0323 2803     		.2byte	0x328
+ 689 0325 18       		.uleb128 0x18
+ 690 0326 32000000 		.4byte	.LASF35
+ 691 032a 32000000 		.4byte	.LASF35
+ 692 032e 09       		.byte	0x9
+ 693 032f 5E       		.byte	0x5e
+ 694 0330 18       		.uleb128 0x18
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 15
+
+
+ 695 0331 30020000 		.4byte	.LASF36
+ 696 0335 30020000 		.4byte	.LASF36
+ 697 0339 09       		.byte	0x9
+ 698 033a 6B       		.byte	0x6b
+ 699 033b 18       		.uleb128 0x18
+ 700 033c E7010000 		.4byte	.LASF37
+ 701 0340 E7010000 		.4byte	.LASF37
+ 702 0344 0A       		.byte	0xa
+ 703 0345 18       		.byte	0x18
+ 704 0346 18       		.uleb128 0x18
+ 705 0347 7E000000 		.4byte	.LASF38
+ 706 034b 7E000000 		.4byte	.LASF38
+ 707 034f 09       		.byte	0x9
+ 708 0350 5A       		.byte	0x5a
+ 709 0351 17       		.uleb128 0x17
+ 710 0352 F5020000 		.4byte	.LASF39
+ 711 0356 F5020000 		.4byte	.LASF39
+ 712 035a 06       		.byte	0x6
+ 713 035b 4101     		.2byte	0x141
+ 714 035d 00       		.byte	0
+ 715              		.section	.debug_abbrev,"",%progbits
+ 716              	.Ldebug_abbrev0:
+ 717 0000 01       		.uleb128 0x1
+ 718 0001 11       		.uleb128 0x11
+ 719 0002 01       		.byte	0x1
+ 720 0003 25       		.uleb128 0x25
+ 721 0004 0E       		.uleb128 0xe
+ 722 0005 13       		.uleb128 0x13
+ 723 0006 0B       		.uleb128 0xb
+ 724 0007 03       		.uleb128 0x3
+ 725 0008 0E       		.uleb128 0xe
+ 726 0009 1B       		.uleb128 0x1b
+ 727 000a 0E       		.uleb128 0xe
+ 728 000b 55       		.uleb128 0x55
+ 729 000c 17       		.uleb128 0x17
+ 730 000d 11       		.uleb128 0x11
+ 731 000e 01       		.uleb128 0x1
+ 732 000f 10       		.uleb128 0x10
+ 733 0010 17       		.uleb128 0x17
+ 734 0011 00       		.byte	0
+ 735 0012 00       		.byte	0
+ 736 0013 02       		.uleb128 0x2
+ 737 0014 24       		.uleb128 0x24
+ 738 0015 00       		.byte	0
+ 739 0016 0B       		.uleb128 0xb
+ 740 0017 0B       		.uleb128 0xb
+ 741 0018 3E       		.uleb128 0x3e
+ 742 0019 0B       		.uleb128 0xb
+ 743 001a 03       		.uleb128 0x3
+ 744 001b 08       		.uleb128 0x8
+ 745 001c 00       		.byte	0
+ 746 001d 00       		.byte	0
+ 747 001e 03       		.uleb128 0x3
+ 748 001f 24       		.uleb128 0x24
+ 749 0020 00       		.byte	0
+ 750 0021 0B       		.uleb128 0xb
+ 751 0022 0B       		.uleb128 0xb
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 16
+
+
+ 752 0023 3E       		.uleb128 0x3e
+ 753 0024 0B       		.uleb128 0xb
+ 754 0025 03       		.uleb128 0x3
+ 755 0026 0E       		.uleb128 0xe
+ 756 0027 00       		.byte	0
+ 757 0028 00       		.byte	0
+ 758 0029 04       		.uleb128 0x4
+ 759 002a 16       		.uleb128 0x16
+ 760 002b 00       		.byte	0
+ 761 002c 03       		.uleb128 0x3
+ 762 002d 0E       		.uleb128 0xe
+ 763 002e 3A       		.uleb128 0x3a
+ 764 002f 0B       		.uleb128 0xb
+ 765 0030 3B       		.uleb128 0x3b
+ 766 0031 0B       		.uleb128 0xb
+ 767 0032 49       		.uleb128 0x49
+ 768 0033 13       		.uleb128 0x13
+ 769 0034 00       		.byte	0
+ 770 0035 00       		.byte	0
+ 771 0036 05       		.uleb128 0x5
+ 772 0037 16       		.uleb128 0x16
+ 773 0038 00       		.byte	0
+ 774 0039 03       		.uleb128 0x3
+ 775 003a 0E       		.uleb128 0xe
+ 776 003b 3A       		.uleb128 0x3a
+ 777 003c 0B       		.uleb128 0xb
+ 778 003d 3B       		.uleb128 0x3b
+ 779 003e 05       		.uleb128 0x5
+ 780 003f 49       		.uleb128 0x49
+ 781 0040 13       		.uleb128 0x13
+ 782 0041 00       		.byte	0
+ 783 0042 00       		.byte	0
+ 784 0043 06       		.uleb128 0x6
+ 785 0044 0F       		.uleb128 0xf
+ 786 0045 00       		.byte	0
+ 787 0046 0B       		.uleb128 0xb
+ 788 0047 0B       		.uleb128 0xb
+ 789 0048 00       		.byte	0
+ 790 0049 00       		.byte	0
+ 791 004a 07       		.uleb128 0x7
+ 792 004b 2E       		.uleb128 0x2e
+ 793 004c 01       		.byte	0x1
+ 794 004d 3F       		.uleb128 0x3f
+ 795 004e 19       		.uleb128 0x19
+ 796 004f 03       		.uleb128 0x3
+ 797 0050 0E       		.uleb128 0xe
+ 798 0051 3A       		.uleb128 0x3a
+ 799 0052 0B       		.uleb128 0xb
+ 800 0053 3B       		.uleb128 0x3b
+ 801 0054 0B       		.uleb128 0xb
+ 802 0055 27       		.uleb128 0x27
+ 803 0056 19       		.uleb128 0x19
+ 804 0057 8701     		.uleb128 0x87
+ 805 0059 19       		.uleb128 0x19
+ 806 005a 11       		.uleb128 0x11
+ 807 005b 01       		.uleb128 0x1
+ 808 005c 12       		.uleb128 0x12
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 17
+
+
+ 809 005d 06       		.uleb128 0x6
+ 810 005e 40       		.uleb128 0x40
+ 811 005f 18       		.uleb128 0x18
+ 812 0060 9742     		.uleb128 0x2117
+ 813 0062 19       		.uleb128 0x19
+ 814 0063 01       		.uleb128 0x1
+ 815 0064 13       		.uleb128 0x13
+ 816 0065 00       		.byte	0
+ 817 0066 00       		.byte	0
+ 818 0067 08       		.uleb128 0x8
+ 819 0068 05       		.uleb128 0x5
+ 820 0069 00       		.byte	0
+ 821 006a 03       		.uleb128 0x3
+ 822 006b 0E       		.uleb128 0xe
+ 823 006c 3A       		.uleb128 0x3a
+ 824 006d 0B       		.uleb128 0xb
+ 825 006e 3B       		.uleb128 0x3b
+ 826 006f 0B       		.uleb128 0xb
+ 827 0070 49       		.uleb128 0x49
+ 828 0071 13       		.uleb128 0x13
+ 829 0072 02       		.uleb128 0x2
+ 830 0073 17       		.uleb128 0x17
+ 831 0074 00       		.byte	0
+ 832 0075 00       		.byte	0
+ 833 0076 09       		.uleb128 0x9
+ 834 0077 34       		.uleb128 0x34
+ 835 0078 00       		.byte	0
+ 836 0079 03       		.uleb128 0x3
+ 837 007a 0E       		.uleb128 0xe
+ 838 007b 3A       		.uleb128 0x3a
+ 839 007c 0B       		.uleb128 0xb
+ 840 007d 3B       		.uleb128 0x3b
+ 841 007e 0B       		.uleb128 0xb
+ 842 007f 49       		.uleb128 0x49
+ 843 0080 13       		.uleb128 0x13
+ 844 0081 02       		.uleb128 0x2
+ 845 0082 18       		.uleb128 0x18
+ 846 0083 00       		.byte	0
+ 847 0084 00       		.byte	0
+ 848 0085 0A       		.uleb128 0xa
+ 849 0086 898201   		.uleb128 0x4109
+ 850 0089 00       		.byte	0
+ 851 008a 11       		.uleb128 0x11
+ 852 008b 01       		.uleb128 0x1
+ 853 008c 31       		.uleb128 0x31
+ 854 008d 13       		.uleb128 0x13
+ 855 008e 00       		.byte	0
+ 856 008f 00       		.byte	0
+ 857 0090 0B       		.uleb128 0xb
+ 858 0091 898201   		.uleb128 0x4109
+ 859 0094 01       		.byte	0x1
+ 860 0095 11       		.uleb128 0x11
+ 861 0096 01       		.uleb128 0x1
+ 862 0097 31       		.uleb128 0x31
+ 863 0098 13       		.uleb128 0x13
+ 864 0099 01       		.uleb128 0x1
+ 865 009a 13       		.uleb128 0x13
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 18
+
+
+ 866 009b 00       		.byte	0
+ 867 009c 00       		.byte	0
+ 868 009d 0C       		.uleb128 0xc
+ 869 009e 8A8201   		.uleb128 0x410a
+ 870 00a1 00       		.byte	0
+ 871 00a2 02       		.uleb128 0x2
+ 872 00a3 18       		.uleb128 0x18
+ 873 00a4 9142     		.uleb128 0x2111
+ 874 00a6 18       		.uleb128 0x18
+ 875 00a7 00       		.byte	0
+ 876 00a8 00       		.byte	0
+ 877 00a9 0D       		.uleb128 0xd
+ 878 00aa 898201   		.uleb128 0x4109
+ 879 00ad 01       		.byte	0x1
+ 880 00ae 11       		.uleb128 0x11
+ 881 00af 01       		.uleb128 0x1
+ 882 00b0 31       		.uleb128 0x31
+ 883 00b1 13       		.uleb128 0x13
+ 884 00b2 00       		.byte	0
+ 885 00b3 00       		.byte	0
+ 886 00b4 0E       		.uleb128 0xe
+ 887 00b5 2E       		.uleb128 0x2e
+ 888 00b6 01       		.byte	0x1
+ 889 00b7 3F       		.uleb128 0x3f
+ 890 00b8 19       		.uleb128 0x19
+ 891 00b9 03       		.uleb128 0x3
+ 892 00ba 0E       		.uleb128 0xe
+ 893 00bb 3A       		.uleb128 0x3a
+ 894 00bc 0B       		.uleb128 0xb
+ 895 00bd 3B       		.uleb128 0x3b
+ 896 00be 0B       		.uleb128 0xb
+ 897 00bf 27       		.uleb128 0x27
+ 898 00c0 19       		.uleb128 0x19
+ 899 00c1 11       		.uleb128 0x11
+ 900 00c2 01       		.uleb128 0x1
+ 901 00c3 12       		.uleb128 0x12
+ 902 00c4 06       		.uleb128 0x6
+ 903 00c5 40       		.uleb128 0x40
+ 904 00c6 18       		.uleb128 0x18
+ 905 00c7 9742     		.uleb128 0x2117
+ 906 00c9 19       		.uleb128 0x19
+ 907 00ca 01       		.uleb128 0x1
+ 908 00cb 13       		.uleb128 0x13
+ 909 00cc 00       		.byte	0
+ 910 00cd 00       		.byte	0
+ 911 00ce 0F       		.uleb128 0xf
+ 912 00cf 34       		.uleb128 0x34
+ 913 00d0 00       		.byte	0
+ 914 00d1 03       		.uleb128 0x3
+ 915 00d2 08       		.uleb128 0x8
+ 916 00d3 3A       		.uleb128 0x3a
+ 917 00d4 0B       		.uleb128 0xb
+ 918 00d5 3B       		.uleb128 0x3b
+ 919 00d6 0B       		.uleb128 0xb
+ 920 00d7 49       		.uleb128 0x49
+ 921 00d8 13       		.uleb128 0x13
+ 922 00d9 02       		.uleb128 0x2
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 19
+
+
+ 923 00da 18       		.uleb128 0x18
+ 924 00db 00       		.byte	0
+ 925 00dc 00       		.byte	0
+ 926 00dd 10       		.uleb128 0x10
+ 927 00de 34       		.uleb128 0x34
+ 928 00df 00       		.byte	0
+ 929 00e0 03       		.uleb128 0x3
+ 930 00e1 08       		.uleb128 0x8
+ 931 00e2 3A       		.uleb128 0x3a
+ 932 00e3 0B       		.uleb128 0xb
+ 933 00e4 3B       		.uleb128 0x3b
+ 934 00e5 0B       		.uleb128 0xb
+ 935 00e6 49       		.uleb128 0x49
+ 936 00e7 13       		.uleb128 0x13
+ 937 00e8 02       		.uleb128 0x2
+ 938 00e9 17       		.uleb128 0x17
+ 939 00ea 00       		.byte	0
+ 940 00eb 00       		.byte	0
+ 941 00ec 11       		.uleb128 0x11
+ 942 00ed 34       		.uleb128 0x34
+ 943 00ee 00       		.byte	0
+ 944 00ef 03       		.uleb128 0x3
+ 945 00f0 0E       		.uleb128 0xe
+ 946 00f1 3A       		.uleb128 0x3a
+ 947 00f2 0B       		.uleb128 0xb
+ 948 00f3 3B       		.uleb128 0x3b
+ 949 00f4 0B       		.uleb128 0xb
+ 950 00f5 49       		.uleb128 0x49
+ 951 00f6 13       		.uleb128 0x13
+ 952 00f7 02       		.uleb128 0x2
+ 953 00f8 17       		.uleb128 0x17
+ 954 00f9 00       		.byte	0
+ 955 00fa 00       		.byte	0
+ 956 00fb 12       		.uleb128 0x12
+ 957 00fc 0B       		.uleb128 0xb
+ 958 00fd 01       		.byte	0x1
+ 959 00fe 11       		.uleb128 0x11
+ 960 00ff 01       		.uleb128 0x1
+ 961 0100 12       		.uleb128 0x12
+ 962 0101 06       		.uleb128 0x6
+ 963 0102 01       		.uleb128 0x1
+ 964 0103 13       		.uleb128 0x13
+ 965 0104 00       		.byte	0
+ 966 0105 00       		.byte	0
+ 967 0106 13       		.uleb128 0x13
+ 968 0107 2E       		.uleb128 0x2e
+ 969 0108 01       		.byte	0x1
+ 970 0109 3F       		.uleb128 0x3f
+ 971 010a 19       		.uleb128 0x19
+ 972 010b 03       		.uleb128 0x3
+ 973 010c 0E       		.uleb128 0xe
+ 974 010d 3A       		.uleb128 0x3a
+ 975 010e 0B       		.uleb128 0xb
+ 976 010f 3B       		.uleb128 0x3b
+ 977 0110 0B       		.uleb128 0xb
+ 978 0111 11       		.uleb128 0x11
+ 979 0112 01       		.uleb128 0x1
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 20
+
+
+ 980 0113 12       		.uleb128 0x12
+ 981 0114 06       		.uleb128 0x6
+ 982 0115 40       		.uleb128 0x40
+ 983 0116 18       		.uleb128 0x18
+ 984 0117 9742     		.uleb128 0x2117
+ 985 0119 19       		.uleb128 0x19
+ 986 011a 01       		.uleb128 0x1
+ 987 011b 13       		.uleb128 0x13
+ 988 011c 00       		.byte	0
+ 989 011d 00       		.byte	0
+ 990 011e 14       		.uleb128 0x14
+ 991 011f 2E       		.uleb128 0x2e
+ 992 0120 00       		.byte	0
+ 993 0121 3F       		.uleb128 0x3f
+ 994 0122 19       		.uleb128 0x19
+ 995 0123 03       		.uleb128 0x3
+ 996 0124 0E       		.uleb128 0xe
+ 997 0125 3A       		.uleb128 0x3a
+ 998 0126 0B       		.uleb128 0xb
+ 999 0127 3B       		.uleb128 0x3b
+ 1000 0128 0B       		.uleb128 0xb
+ 1001 0129 27       		.uleb128 0x27
+ 1002 012a 19       		.uleb128 0x19
+ 1003 012b 49       		.uleb128 0x49
+ 1004 012c 13       		.uleb128 0x13
+ 1005 012d 11       		.uleb128 0x11
+ 1006 012e 01       		.uleb128 0x1
+ 1007 012f 12       		.uleb128 0x12
+ 1008 0130 06       		.uleb128 0x6
+ 1009 0131 40       		.uleb128 0x40
+ 1010 0132 18       		.uleb128 0x18
+ 1011 0133 9742     		.uleb128 0x2117
+ 1012 0135 19       		.uleb128 0x19
+ 1013 0136 00       		.byte	0
+ 1014 0137 00       		.byte	0
+ 1015 0138 15       		.uleb128 0x15
+ 1016 0139 35       		.uleb128 0x35
+ 1017 013a 00       		.byte	0
+ 1018 013b 49       		.uleb128 0x49
+ 1019 013c 13       		.uleb128 0x13
+ 1020 013d 00       		.byte	0
+ 1021 013e 00       		.byte	0
+ 1022 013f 16       		.uleb128 0x16
+ 1023 0140 34       		.uleb128 0x34
+ 1024 0141 00       		.byte	0
+ 1025 0142 03       		.uleb128 0x3
+ 1026 0143 0E       		.uleb128 0xe
+ 1027 0144 3A       		.uleb128 0x3a
+ 1028 0145 0B       		.uleb128 0xb
+ 1029 0146 3B       		.uleb128 0x3b
+ 1030 0147 05       		.uleb128 0x5
+ 1031 0148 49       		.uleb128 0x49
+ 1032 0149 13       		.uleb128 0x13
+ 1033 014a 3F       		.uleb128 0x3f
+ 1034 014b 19       		.uleb128 0x19
+ 1035 014c 3C       		.uleb128 0x3c
+ 1036 014d 19       		.uleb128 0x19
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 21
+
+
+ 1037 014e 00       		.byte	0
+ 1038 014f 00       		.byte	0
+ 1039 0150 17       		.uleb128 0x17
+ 1040 0151 2E       		.uleb128 0x2e
+ 1041 0152 00       		.byte	0
+ 1042 0153 3F       		.uleb128 0x3f
+ 1043 0154 19       		.uleb128 0x19
+ 1044 0155 3C       		.uleb128 0x3c
+ 1045 0156 19       		.uleb128 0x19
+ 1046 0157 6E       		.uleb128 0x6e
+ 1047 0158 0E       		.uleb128 0xe
+ 1048 0159 03       		.uleb128 0x3
+ 1049 015a 0E       		.uleb128 0xe
+ 1050 015b 3A       		.uleb128 0x3a
+ 1051 015c 0B       		.uleb128 0xb
+ 1052 015d 3B       		.uleb128 0x3b
+ 1053 015e 05       		.uleb128 0x5
+ 1054 015f 00       		.byte	0
+ 1055 0160 00       		.byte	0
+ 1056 0161 18       		.uleb128 0x18
+ 1057 0162 2E       		.uleb128 0x2e
+ 1058 0163 00       		.byte	0
+ 1059 0164 3F       		.uleb128 0x3f
+ 1060 0165 19       		.uleb128 0x19
+ 1061 0166 3C       		.uleb128 0x3c
+ 1062 0167 19       		.uleb128 0x19
+ 1063 0168 6E       		.uleb128 0x6e
+ 1064 0169 0E       		.uleb128 0xe
+ 1065 016a 03       		.uleb128 0x3
+ 1066 016b 0E       		.uleb128 0xe
+ 1067 016c 3A       		.uleb128 0x3a
+ 1068 016d 0B       		.uleb128 0xb
+ 1069 016e 3B       		.uleb128 0x3b
+ 1070 016f 0B       		.uleb128 0xb
+ 1071 0170 00       		.byte	0
+ 1072 0171 00       		.byte	0
+ 1073 0172 00       		.byte	0
+ 1074              		.section	.debug_loc,"",%progbits
+ 1075              	.Ldebug_loc0:
+ 1076              	.LLST0:
+ 1077 0000 00000000 		.4byte	.LVL0
+ 1078 0004 07000000 		.4byte	.LVL1-1
+ 1079 0008 0100     		.2byte	0x1
+ 1080 000a 50       		.byte	0x50
+ 1081 000b 07000000 		.4byte	.LVL1-1
+ 1082 000f 2C000000 		.4byte	.LFE68
+ 1083 0013 0400     		.2byte	0x4
+ 1084 0015 F3       		.byte	0xf3
+ 1085 0016 01       		.uleb128 0x1
+ 1086 0017 50       		.byte	0x50
+ 1087 0018 9F       		.byte	0x9f
+ 1088 0019 00000000 		.4byte	0
+ 1089 001d 00000000 		.4byte	0
+ 1090              	.LLST1:
+ 1091 0021 18000000 		.4byte	.LVL10
+ 1092 0025 56000000 		.4byte	.LVL15
+ 1093 0029 0100     		.2byte	0x1
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 22
+
+
+ 1094 002b 56       		.byte	0x56
+ 1095 002c 00000000 		.4byte	0
+ 1096 0030 00000000 		.4byte	0
+ 1097              	.LLST2:
+ 1098 0034 08000000 		.4byte	.LVL8
+ 1099 0038 15000000 		.4byte	.LVL9-1
+ 1100 003c 0600     		.2byte	0x6
+ 1101 003e 70       		.byte	0x70
+ 1102 003f 00       		.sleb128 0
+ 1103 0040 08       		.byte	0x8
+ 1104 0041 FF       		.byte	0xff
+ 1105 0042 1A       		.byte	0x1a
+ 1106 0043 9F       		.byte	0x9f
+ 1107 0044 00000000 		.4byte	0
+ 1108 0048 00000000 		.4byte	0
+ 1109              	.LLST3:
+ 1110 004c 26000000 		.4byte	.LVL12
+ 1111 0050 3A000000 		.4byte	.LVL13
+ 1112 0054 0100     		.2byte	0x1
+ 1113 0056 53       		.byte	0x53
+ 1114 0057 3A000000 		.4byte	.LVL13
+ 1115 005b 48000000 		.4byte	.LVL14
+ 1116 005f 0F00     		.2byte	0xf
+ 1117 0061 03       		.byte	0x3
+ 1118 0062 00000000 		.4byte	prev.7509
+ 1119 0066 94       		.byte	0x94
+ 1120 0067 02       		.byte	0x2
+ 1121 0068 0A       		.byte	0xa
+ 1122 0069 FFFF     		.2byte	0xffff
+ 1123 006b 1A       		.byte	0x1a
+ 1124 006c 76       		.byte	0x76
+ 1125 006d 00       		.sleb128 0
+ 1126 006e 1C       		.byte	0x1c
+ 1127 006f 9F       		.byte	0x9f
+ 1128 0070 00000000 		.4byte	0
+ 1129 0074 00000000 		.4byte	0
+ 1130              		.section	.debug_aranges,"",%progbits
+ 1131 0000 34000000 		.4byte	0x34
+ 1132 0004 0200     		.2byte	0x2
+ 1133 0006 00000000 		.4byte	.Ldebug_info0
+ 1134 000a 04       		.byte	0x4
+ 1135 000b 00       		.byte	0
+ 1136 000c 0000     		.2byte	0
+ 1137 000e 0000     		.2byte	0
+ 1138 0010 00000000 		.4byte	.LFB68
+ 1139 0014 2C000000 		.4byte	.LFE68-.LFB68
+ 1140 0018 00000000 		.4byte	.LFB69
+ 1141 001c 74000000 		.4byte	.LFE69-.LFB69
+ 1142 0020 00000000 		.4byte	.LFB70
+ 1143 0024 44000000 		.4byte	.LFE70-.LFB70
+ 1144 0028 00000000 		.4byte	.LFB71
+ 1145 002c 0C000000 		.4byte	.LFE71-.LFB71
+ 1146 0030 00000000 		.4byte	0
+ 1147 0034 00000000 		.4byte	0
+ 1148              		.section	.debug_ranges,"",%progbits
+ 1149              	.Ldebug_ranges0:
+ 1150 0000 00000000 		.4byte	.LFB68
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 23
+
+
+ 1151 0004 2C000000 		.4byte	.LFE68
+ 1152 0008 00000000 		.4byte	.LFB69
+ 1153 000c 74000000 		.4byte	.LFE69
+ 1154 0010 00000000 		.4byte	.LFB70
+ 1155 0014 44000000 		.4byte	.LFE70
+ 1156 0018 00000000 		.4byte	.LFB71
+ 1157 001c 0C000000 		.4byte	.LFE71
+ 1158 0020 00000000 		.4byte	0
+ 1159 0024 00000000 		.4byte	0
+ 1160              		.section	.debug_line,"",%progbits
+ 1161              	.Ldebug_line0:
+ 1162 0000 4E020000 		.section	.debug_str,"MS",%progbits,1
+ 1162      0200E301 
+ 1162      00000201 
+ 1162      FB0E0D00 
+ 1162      01010101 
+ 1163              	.LASF32:
+ 1164 0000 54726967 		.ascii	"Trig_Write\000"
+ 1164      5F577269 
+ 1164      746500
+ 1165              	.LASF45:
+ 1166 000b 756C7472 		.ascii	"ultra_isr_handler\000"
+ 1166      615F6973 
+ 1166      725F6861 
+ 1166      6E646C65 
+ 1166      7200
+ 1167              	.LASF22:
+ 1168 001d 5469636B 		.ascii	"TickType_t\000"
+ 1168      54797065 
+ 1168      5F7400
+ 1169              	.LASF8:
+ 1170 0028 5F5F696E 		.ascii	"__int32_t\000"
+ 1170      7433325F 
+ 1170      7400
+ 1171              	.LASF35:
+ 1172 0032 54696D65 		.ascii	"Timer_ReadStatusRegister\000"
+ 1172      725F5265 
+ 1172      61645374 
+ 1172      61747573 
+ 1172      52656769 
+ 1173              	.LASF43:
+ 1174 004b 556C7472 		.ascii	"UltraSonicTask\000"
+ 1174      61536F6E 
+ 1174      69635461 
+ 1174      736B00
+ 1175              	.LASF26:
+ 1176 005a 73746174 		.ascii	"status\000"
+ 1176      757300
+ 1177              	.LASF14:
+ 1178 0061 696E7433 		.ascii	"int32_t\000"
+ 1178      325F7400 
+ 1179              	.LASF29:
+ 1180 0069 64697374 		.ascii	"distance\000"
+ 1180      616E6365 
+ 1180      00
+ 1181              	.LASF17:
+ 1182 0072 666C6F61 		.ascii	"float\000"
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 24
+
+
+ 1182      7400
+ 1183              	.LASF16:
+ 1184 0078 75696E74 		.ascii	"uint8\000"
+ 1184      3800
+ 1185              	.LASF38:
+ 1186 007e 54696D65 		.ascii	"Timer_Start\000"
+ 1186      725F5374 
+ 1186      61727400 
+ 1187              	.LASF28:
+ 1188 008a 556C7472 		.ascii	"UltraHandle\000"
+ 1188      6148616E 
+ 1188      646C6500 
+ 1189              	.LASF40:
+ 1190 0096 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1190      43313120 
+ 1190      352E342E 
+ 1190      31203230 
+ 1190      31363036 
+ 1191 00c9 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1191      20726576 
+ 1191      6973696F 
+ 1191      6E203233 
+ 1191      37373135 
+ 1192 00fc 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1192      66756E63 
+ 1192      74696F6E 
+ 1192      2D736563 
+ 1192      74696F6E 
+ 1193              	.LASF11:
+ 1194 0124 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1194      20756E73 
+ 1194      69676E65 
+ 1194      6420696E 
+ 1194      7400
+ 1195              	.LASF6:
+ 1196 0136 73686F72 		.ascii	"short unsigned int\000"
+ 1196      7420756E 
+ 1196      7369676E 
+ 1196      65642069 
+ 1196      6E7400
+ 1197              	.LASF34:
+ 1198 0149 76546173 		.ascii	"vTaskDelayUntil\000"
+ 1198      6B44656C 
+ 1198      6179556E 
+ 1198      74696C00 
+ 1199              	.LASF48:
+ 1200 0159 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1200      52784275 
+ 1200      66666572 
+ 1200      00
+ 1201              	.LASF4:
+ 1202 0166 756E7369 		.ascii	"unsigned char\000"
+ 1202      676E6564 
+ 1202      20636861 
+ 1202      7200
+ 1203              	.LASF7:
+ 1204 0174 5F5F7569 		.ascii	"__uint16_t\000"
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 25
+
+
+ 1204      6E743136 
+ 1204      5F7400
+ 1205              	.LASF18:
+ 1206 017f 646F7562 		.ascii	"double\000"
+ 1206      6C6500
+ 1207              	.LASF10:
+ 1208 0186 5F5F7569 		.ascii	"__uint32_t\000"
+ 1208      6E743332 
+ 1208      5F7400
+ 1209              	.LASF46:
+ 1210 0191 556C7472 		.ascii	"Ultra_Start\000"
+ 1210      615F5374 
+ 1210      61727400 
+ 1211              	.LASF0:
+ 1212 019d 756E7369 		.ascii	"unsigned int\000"
+ 1212      676E6564 
+ 1212      20696E74 
+ 1212      00
+ 1213              	.LASF31:
+ 1214 01aa 4563686F 		.ascii	"Echo_Read\000"
+ 1214      5F526561 
+ 1214      6400
+ 1215              	.LASF12:
+ 1216 01b4 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1216      206C6F6E 
+ 1216      6720756E 
+ 1216      7369676E 
+ 1216      65642069 
+ 1217              	.LASF27:
+ 1218 01cb 74696D65 		.ascii	"time\000"
+ 1218      00
+ 1219              	.LASF20:
+ 1220 01d0 73697A65 		.ascii	"sizetype\000"
+ 1220      74797065 
+ 1220      00
+ 1221              	.LASF1:
+ 1222 01d9 6C6F6E67 		.ascii	"long long int\000"
+ 1222      206C6F6E 
+ 1222      6720696E 
+ 1222      7400
+ 1223              	.LASF37:
+ 1224 01e7 756C7472 		.ascii	"ultra_isr_StartEx\000"
+ 1224      615F6973 
+ 1224      725F5374 
+ 1224      61727445 
+ 1224      7800
+ 1225              	.LASF19:
+ 1226 01f9 63686172 		.ascii	"char\000"
+ 1226      00
+ 1227              	.LASF44:
+ 1228 01fe 70765061 		.ascii	"pvParameters\000"
+ 1228      72616D65 
+ 1228      74657273 
+ 1228      00
+ 1229              	.LASF30:
+ 1230 020b 78546173 		.ascii	"xTaskGetTickCount\000"
+ 1230      6B476574 
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 26
+
+
+ 1230      5469636B 
+ 1230      436F756E 
+ 1230      7400
+ 1231              	.LASF5:
+ 1232 021d 73686F72 		.ascii	"short int\000"
+ 1232      7420696E 
+ 1232      7400
+ 1233              	.LASF13:
+ 1234 0227 75696E74 		.ascii	"uint16_t\000"
+ 1234      31365F74 
+ 1234      00
+ 1235              	.LASF36:
+ 1236 0230 54696D65 		.ascii	"Timer_ReadCapture\000"
+ 1236      725F5265 
+ 1236      61644361 
+ 1236      70747572 
+ 1236      6500
+ 1237              	.LASF23:
+ 1238 0242 5461736B 		.ascii	"TaskHandle_t\000"
+ 1238      48616E64 
+ 1238      6C655F74 
+ 1238      00
+ 1239              	.LASF15:
+ 1240 024f 75696E74 		.ascii	"uint32_t\000"
+ 1240      33325F74 
+ 1240      00
+ 1241              	.LASF9:
+ 1242 0258 6C6F6E67 		.ascii	"long int\000"
+ 1242      20696E74 
+ 1242      00
+ 1243              	.LASF33:
+ 1244 0261 76546173 		.ascii	"vTaskDelay\000"
+ 1244      6B44656C 
+ 1244      617900
+ 1245              	.LASF2:
+ 1246 026c 6C6F6E67 		.ascii	"long double\000"
+ 1246      20646F75 
+ 1246      626C6500 
+ 1247              	.LASF42:
+ 1248 0278 433A5C55 		.ascii	"C:\\Users\\samue\\Desktop\\RobotRage2\\Zumo\\ZumoBo"
+ 1248      73657273 
+ 1248      5C73616D 
+ 1248      75655C44 
+ 1248      65736B74 
+ 1249 02a5 742E6379 		.ascii	"t.cydsn\000"
+ 1249      64736E00 
+ 1250              	.LASF3:
+ 1251 02ad 7369676E 		.ascii	"signed char\000"
+ 1251      65642063 
+ 1251      68617200 
+ 1252              	.LASF41:
+ 1253 02b9 5A756D6F 		.ascii	"ZumoLibrary\\Ultra.c\000"
+ 1253      4C696272 
+ 1253      6172795C 
+ 1253      556C7472 
+ 1253      612E6300 
+ 1254              	.LASF47:
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccEfsy6u.s 			page 27
+
+
+ 1255 02cd 556C7472 		.ascii	"Ultra_GetDistance\000"
+ 1255      615F4765 
+ 1255      74446973 
+ 1255      74616E63 
+ 1255      6500
+ 1256              	.LASF21:
+ 1257 02df 55426173 		.ascii	"UBaseType_t\000"
+ 1257      65547970 
+ 1257      655F7400 
+ 1258              	.LASF25:
+ 1259 02eb 6563686F 		.ascii	"echo\000"
+ 1259      00
+ 1260              	.LASF24:
+ 1261 02f0 70726576 		.ascii	"prev\000"
+ 1261      00
+ 1262              	.LASF39:
+ 1263 02f5 78546173 		.ascii	"xTaskCreate\000"
+ 1263      6B437265 
+ 1263      61746500 
+ 1264              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

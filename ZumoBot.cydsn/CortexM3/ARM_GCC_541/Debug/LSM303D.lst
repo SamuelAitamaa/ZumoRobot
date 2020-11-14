@@ -1,0 +1,1024 @@
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"LSM303D.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.LSM303D_Start,"ax",%progbits
+  20              		.align	2
+  21              		.global	LSM303D_Start
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	LSM303D_Start, %function
+  25              	LSM303D_Start:
+  26              	.LFB68:
+  27              		.file 1 "ZumoLibrary\\LSM303D.c"
+   1:ZumoLibrary/LSM303D.c **** /* ========================================
+   2:ZumoLibrary/LSM303D.c ****  *
+   3:ZumoLibrary/LSM303D.c ****  * Copyright YOUR COMPANY, THE YEAR
+   4:ZumoLibrary/LSM303D.c ****  * All Rights Reserved
+   5:ZumoLibrary/LSM303D.c ****  * UNPUBLISHED, LICENSED SOFTWARE.
+   6:ZumoLibrary/LSM303D.c ****  *
+   7:ZumoLibrary/LSM303D.c ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
+   8:ZumoLibrary/LSM303D.c ****  * WHICH IS THE PROPERTY OF your company.
+   9:ZumoLibrary/LSM303D.c ****  *
+  10:ZumoLibrary/LSM303D.c ****  * ========================================
+  11:ZumoLibrary/LSM303D.c **** */
+  12:ZumoLibrary/LSM303D.c **** 
+  13:ZumoLibrary/LSM303D.c **** /*Usage Example at the bottom of this file!!!*/
+  14:ZumoLibrary/LSM303D.c **** #include "FreeRTOS.h"
+  15:ZumoLibrary/LSM303D.c **** #include "task.h"
+  16:ZumoLibrary/LSM303D.c **** 
+  17:ZumoLibrary/LSM303D.c **** 
+  18:ZumoLibrary/LSM303D.c **** #include"LSM303D.h"
+  19:ZumoLibrary/LSM303D.c **** #include"I2C.h"
+  20:ZumoLibrary/LSM303D.c **** #include"I2C_Common.h"
+  21:ZumoLibrary/LSM303D.c **** 
+  22:ZumoLibrary/LSM303D.c **** uint8_t LSM303D_Start(void){
+  28              		.loc 1 22 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 3, -8
+  35              		.cfi_offset 14, -4
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 2
+
+
+  23:ZumoLibrary/LSM303D.c ****     
+  24:ZumoLibrary/LSM303D.c ****     I2C_Start();
+  36              		.loc 1 24 0
+  37 0002 FFF7FEFF 		bl	I2C_Start
+  38              	.LVL0:
+  25:ZumoLibrary/LSM303D.c ****     I2C_Write(LSM303D, CTRL_1, 0x77);           // set accelerometer & magnetometer into active mod
+  39              		.loc 1 25 0
+  40 0006 7722     		movs	r2, #119
+  41 0008 2021     		movs	r1, #32
+  42 000a 1D20     		movs	r0, #29
+  43 000c FFF7FEFF 		bl	I2C_Write
+  44              	.LVL1:
+  26:ZumoLibrary/LSM303D.c ****     I2C_Write(LSM303D, CTRL_7, 0x83);
+  45              		.loc 1 26 0
+  46 0010 8322     		movs	r2, #131
+  47 0012 2621     		movs	r1, #38
+  48 0014 1D20     		movs	r0, #29
+  49 0016 FFF7FEFF 		bl	I2C_Write
+  50              	.LVL2:
+  27:ZumoLibrary/LSM303D.c ****     
+  28:ZumoLibrary/LSM303D.c ****     if(I2C_Read(LSM303D, WHO_AM_I) == DEV_ID){
+  51              		.loc 1 28 0
+  52 001a 0F21     		movs	r1, #15
+  53 001c 1D20     		movs	r0, #29
+  54 001e FFF7FEFF 		bl	I2C_Read
+  55              	.LVL3:
+  56 0022 4928     		cmp	r0, #73
+  57 0024 01D1     		bne	.L3
+  29:ZumoLibrary/LSM303D.c **** 
+  30:ZumoLibrary/LSM303D.c ****         return 1;
+  58              		.loc 1 30 0
+  59 0026 0120     		movs	r0, #1
+  60 0028 08BD     		pop	{r3, pc}
+  61              	.L3:
+  31:ZumoLibrary/LSM303D.c **** 
+  32:ZumoLibrary/LSM303D.c ****     }
+  33:ZumoLibrary/LSM303D.c ****     else {
+  34:ZumoLibrary/LSM303D.c ****     
+  35:ZumoLibrary/LSM303D.c ****         return 0;
+  62              		.loc 1 35 0
+  63 002a 0020     		movs	r0, #0
+  36:ZumoLibrary/LSM303D.c ****     
+  37:ZumoLibrary/LSM303D.c ****     }
+  38:ZumoLibrary/LSM303D.c **** }
+  64              		.loc 1 38 0
+  65 002c 08BD     		pop	{r3, pc}
+  66              		.cfi_endproc
+  67              	.LFE68:
+  68              		.size	LSM303D_Start, .-LSM303D_Start
+  69 002e 00BF     		.section	.text.LSM303D_Read_Acc,"ax",%progbits
+  70              		.align	2
+  71              		.global	LSM303D_Read_Acc
+  72              		.thumb
+  73              		.thumb_func
+  74              		.type	LSM303D_Read_Acc, %function
+  75              	LSM303D_Read_Acc:
+  76              	.LFB69:
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 3
+
+
+  39:ZumoLibrary/LSM303D.c **** 
+  40:ZumoLibrary/LSM303D.c **** 
+  41:ZumoLibrary/LSM303D.c **** 
+  42:ZumoLibrary/LSM303D.c **** void LSM303D_Read_Acc(struct accData_* data){
+  77              		.loc 1 42 0
+  78              		.cfi_startproc
+  79              		@ args = 0, pretend = 0, frame = 8
+  80              		@ frame_needed = 0, uses_anonymous_args = 0
+  81              	.LVL4:
+  82 0000 10B5     		push	{r4, lr}
+  83              		.cfi_def_cfa_offset 8
+  84              		.cfi_offset 4, -8
+  85              		.cfi_offset 14, -4
+  86 0002 82B0     		sub	sp, sp, #8
+  87              		.cfi_def_cfa_offset 16
+  88 0004 0446     		mov	r4, r0
+  43:ZumoLibrary/LSM303D.c ****     
+  44:ZumoLibrary/LSM303D.c ****     uint8_t xyz[6];
+  45:ZumoLibrary/LSM303D.c ****     
+  46:ZumoLibrary/LSM303D.c ****     I2C_Read_Multiple(LSM303D, OUT_X_L_A | MULTIPLE_READ, xyz, 6);
+  89              		.loc 1 46 0
+  90 0006 0623     		movs	r3, #6
+  91 0008 6A46     		mov	r2, sp
+  92 000a A821     		movs	r1, #168
+  93 000c 1D20     		movs	r0, #29
+  94              	.LVL5:
+  95 000e FFF7FEFF 		bl	I2C_Read_Multiple
+  96              	.LVL6:
+  47:ZumoLibrary/LSM303D.c ****     
+  48:ZumoLibrary/LSM303D.c ****     data->accX = (int16)(xyz[1] << 8 | xyz[0]);
+  97              		.loc 1 48 0
+  98 0012 9DF80120 		ldrb	r2, [sp, #1]	@ zero_extendqisi2
+  99 0016 9DF80030 		ldrb	r3, [sp]	@ zero_extendqisi2
+ 100 001a 43EA0223 		orr	r3, r3, r2, lsl #8
+ 101 001e 2380     		strh	r3, [r4]	@ movhi
+  49:ZumoLibrary/LSM303D.c ****     data->accY = (int16)(xyz[3] << 8 | xyz[2]);
+ 102              		.loc 1 49 0
+ 103 0020 9DF80320 		ldrb	r2, [sp, #3]	@ zero_extendqisi2
+ 104 0024 9DF80230 		ldrb	r3, [sp, #2]	@ zero_extendqisi2
+ 105 0028 43EA0223 		orr	r3, r3, r2, lsl #8
+ 106 002c 6380     		strh	r3, [r4, #2]	@ movhi
+  50:ZumoLibrary/LSM303D.c ****     data->accZ = (int16)(xyz[5] << 8 | xyz[4]);
+ 107              		.loc 1 50 0
+ 108 002e 9DF80520 		ldrb	r2, [sp, #5]	@ zero_extendqisi2
+ 109 0032 9DF80430 		ldrb	r3, [sp, #4]	@ zero_extendqisi2
+ 110 0036 43EA0223 		orr	r3, r3, r2, lsl #8
+ 111 003a A380     		strh	r3, [r4, #4]	@ movhi
+  51:ZumoLibrary/LSM303D.c **** }
+ 112              		.loc 1 51 0
+ 113 003c 02B0     		add	sp, sp, #8
+ 114              		.cfi_def_cfa_offset 8
+ 115              		@ sp needed
+ 116 003e 10BD     		pop	{r4, pc}
+ 117              		.cfi_endproc
+ 118              	.LFE69:
+ 119              		.size	LSM303D_Read_Acc, .-LSM303D_Read_Acc
+ 120              		.text
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 4
+
+
+ 121              	.Letext0:
+ 122              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 123              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.2\\psoc creator\\import\\gnu\\arm\\5.4.
+ 124              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 125              		.file 5 "ZumoLibrary\\LSM303D.h"
+ 126              		.file 6 "Generated_Source\\PSoC5/I2C.h"
+ 127              		.file 7 "ZumoLibrary\\I2C_Common.h"
+ 128              		.file 8 "Generated_Source\\PSoC5/core_cm3.h"
+ 129              		.section	.debug_info,"",%progbits
+ 130              	.Ldebug_info0:
+ 131 0000 25020000 		.4byte	0x225
+ 132 0004 0400     		.2byte	0x4
+ 133 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 134 000a 04       		.byte	0x4
+ 135 000b 01       		.uleb128 0x1
+ 136 000c 70000000 		.4byte	.LASF28
+ 137 0010 0C       		.byte	0xc
+ 138 0011 89010000 		.4byte	.LASF29
+ 139 0015 E6010000 		.4byte	.LASF30
+ 140 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 141 001d 00000000 		.4byte	0
+ 142 0021 00000000 		.4byte	.Ldebug_line0
+ 143 0025 02       		.uleb128 0x2
+ 144 0026 04       		.byte	0x4
+ 145 0027 05       		.byte	0x5
+ 146 0028 696E7400 		.ascii	"int\000"
+ 147 002c 03       		.uleb128 0x3
+ 148 002d 04       		.byte	0x4
+ 149 002e 07       		.byte	0x7
+ 150 002f 55010000 		.4byte	.LASF0
+ 151 0033 03       		.uleb128 0x3
+ 152 0034 08       		.byte	0x8
+ 153 0035 05       		.byte	0x5
+ 154 0036 00000000 		.4byte	.LASF1
+ 155 003a 03       		.uleb128 0x3
+ 156 003b 08       		.byte	0x8
+ 157 003c 04       		.byte	0x4
+ 158 003d DA010000 		.4byte	.LASF2
+ 159 0041 03       		.uleb128 0x3
+ 160 0042 01       		.byte	0x1
+ 161 0043 06       		.byte	0x6
+ 162 0044 1B020000 		.4byte	.LASF3
+ 163 0048 04       		.uleb128 0x4
+ 164 0049 17000000 		.4byte	.LASF5
+ 165 004d 02       		.byte	0x2
+ 166 004e 1D       		.byte	0x1d
+ 167 004f 53000000 		.4byte	0x53
+ 168 0053 03       		.uleb128 0x3
+ 169 0054 01       		.byte	0x1
+ 170 0055 08       		.byte	0x8
+ 171 0056 36010000 		.4byte	.LASF4
+ 172 005a 04       		.uleb128 0x4
+ 173 005b 21000000 		.4byte	.LASF6
+ 174 005f 02       		.byte	0x2
+ 175 0060 29       		.byte	0x29
+ 176 0061 65000000 		.4byte	0x65
+ 177 0065 03       		.uleb128 0x3
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 5
+
+
+ 178 0066 02       		.byte	0x2
+ 179 0067 05       		.byte	0x5
+ 180 0068 B5010000 		.4byte	.LASF7
+ 181 006c 03       		.uleb128 0x3
+ 182 006d 02       		.byte	0x2
+ 183 006e 07       		.byte	0x7
+ 184 006f 16010000 		.4byte	.LASF8
+ 185 0073 04       		.uleb128 0x4
+ 186 0074 2B000000 		.4byte	.LASF9
+ 187 0078 02       		.byte	0x2
+ 188 0079 3F       		.byte	0x3f
+ 189 007a 7E000000 		.4byte	0x7e
+ 190 007e 03       		.uleb128 0x3
+ 191 007f 04       		.byte	0x4
+ 192 0080 05       		.byte	0x5
+ 193 0081 D1010000 		.4byte	.LASF10
+ 194 0085 03       		.uleb128 0x3
+ 195 0086 04       		.byte	0x4
+ 196 0087 07       		.byte	0x7
+ 197 0088 04010000 		.4byte	.LASF11
+ 198 008c 03       		.uleb128 0x3
+ 199 008d 08       		.byte	0x8
+ 200 008e 07       		.byte	0x7
+ 201 008f 62010000 		.4byte	.LASF12
+ 202 0093 04       		.uleb128 0x4
+ 203 0094 79010000 		.4byte	.LASF13
+ 204 0098 03       		.byte	0x3
+ 205 0099 18       		.byte	0x18
+ 206 009a 48000000 		.4byte	0x48
+ 207 009e 04       		.uleb128 0x4
+ 208 009f 81010000 		.4byte	.LASF14
+ 209 00a3 03       		.byte	0x3
+ 210 00a4 20       		.byte	0x20
+ 211 00a5 5A000000 		.4byte	0x5a
+ 212 00a9 04       		.uleb128 0x4
+ 213 00aa 9F010000 		.4byte	.LASF15
+ 214 00ae 03       		.byte	0x3
+ 215 00af 2C       		.byte	0x2c
+ 216 00b0 73000000 		.4byte	0x73
+ 217 00b4 05       		.uleb128 0x5
+ 218 00b5 FE000000 		.4byte	.LASF16
+ 219 00b9 04       		.byte	0x4
+ 220 00ba E801     		.2byte	0x1e8
+ 221 00bc 65000000 		.4byte	0x65
+ 222 00c0 03       		.uleb128 0x3
+ 223 00c1 04       		.byte	0x4
+ 224 00c2 04       		.byte	0x4
+ 225 00c3 48000000 		.4byte	.LASF17
+ 226 00c7 03       		.uleb128 0x3
+ 227 00c8 08       		.byte	0x8
+ 228 00c9 04       		.byte	0x4
+ 229 00ca 44010000 		.4byte	.LASF18
+ 230 00ce 03       		.uleb128 0x3
+ 231 00cf 01       		.byte	0x1
+ 232 00d0 08       		.byte	0x8
+ 233 00d1 B0010000 		.4byte	.LASF19
+ 234 00d5 03       		.uleb128 0x3
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 6
+
+
+ 235 00d6 04       		.byte	0x4
+ 236 00d7 07       		.byte	0x7
+ 237 00d8 A7010000 		.4byte	.LASF20
+ 238 00dc 06       		.uleb128 0x6
+ 239 00dd 35000000 		.4byte	.LASF31
+ 240 00e1 06       		.byte	0x6
+ 241 00e2 05       		.byte	0x5
+ 242 00e3 47       		.byte	0x47
+ 243 00e4 0D010000 		.4byte	0x10d
+ 244 00e8 07       		.uleb128 0x7
+ 245 00e9 61000000 		.4byte	.LASF21
+ 246 00ed 05       		.byte	0x5
+ 247 00ee 49       		.byte	0x49
+ 248 00ef 9E000000 		.4byte	0x9e
+ 249 00f3 00       		.byte	0
+ 250 00f4 07       		.uleb128 0x7
+ 251 00f5 66000000 		.4byte	.LASF22
+ 252 00f9 05       		.byte	0x5
+ 253 00fa 4A       		.byte	0x4a
+ 254 00fb 9E000000 		.4byte	0x9e
+ 255 00ff 02       		.byte	0x2
+ 256 0100 07       		.uleb128 0x7
+ 257 0101 6B000000 		.4byte	.LASF23
+ 258 0105 05       		.byte	0x5
+ 259 0106 4B       		.byte	0x4b
+ 260 0107 9E000000 		.4byte	0x9e
+ 261 010b 04       		.byte	0x4
+ 262 010c 00       		.byte	0
+ 263 010d 08       		.uleb128 0x8
+ 264 010e 53000000 		.4byte	.LASF32
+ 265 0112 01       		.byte	0x1
+ 266 0113 16       		.byte	0x16
+ 267 0114 93000000 		.4byte	0x93
+ 268 0118 00000000 		.4byte	.LFB68
+ 269 011c 2E000000 		.4byte	.LFE68-.LFB68
+ 270 0120 01       		.uleb128 0x1
+ 271 0121 9C       		.byte	0x9c
+ 272 0122 82010000 		.4byte	0x182
+ 273 0126 09       		.uleb128 0x9
+ 274 0127 06000000 		.4byte	.LVL0
+ 275 012b FC010000 		.4byte	0x1fc
+ 276 012f 0A       		.uleb128 0xa
+ 277 0130 10000000 		.4byte	.LVL1
+ 278 0134 07020000 		.4byte	0x207
+ 279 0138 4E010000 		.4byte	0x14e
+ 280 013c 0B       		.uleb128 0xb
+ 281 013d 01       		.uleb128 0x1
+ 282 013e 50       		.byte	0x50
+ 283 013f 01       		.uleb128 0x1
+ 284 0140 4D       		.byte	0x4d
+ 285 0141 0B       		.uleb128 0xb
+ 286 0142 01       		.uleb128 0x1
+ 287 0143 51       		.byte	0x51
+ 288 0144 02       		.uleb128 0x2
+ 289 0145 08       		.byte	0x8
+ 290 0146 20       		.byte	0x20
+ 291 0147 0B       		.uleb128 0xb
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 7
+
+
+ 292 0148 01       		.uleb128 0x1
+ 293 0149 52       		.byte	0x52
+ 294 014a 02       		.uleb128 0x2
+ 295 014b 08       		.byte	0x8
+ 296 014c 77       		.byte	0x77
+ 297 014d 00       		.byte	0
+ 298 014e 0A       		.uleb128 0xa
+ 299 014f 1A000000 		.4byte	.LVL2
+ 300 0153 07020000 		.4byte	0x207
+ 301 0157 6D010000 		.4byte	0x16d
+ 302 015b 0B       		.uleb128 0xb
+ 303 015c 01       		.uleb128 0x1
+ 304 015d 50       		.byte	0x50
+ 305 015e 01       		.uleb128 0x1
+ 306 015f 4D       		.byte	0x4d
+ 307 0160 0B       		.uleb128 0xb
+ 308 0161 01       		.uleb128 0x1
+ 309 0162 51       		.byte	0x51
+ 310 0163 02       		.uleb128 0x2
+ 311 0164 08       		.byte	0x8
+ 312 0165 26       		.byte	0x26
+ 313 0166 0B       		.uleb128 0xb
+ 314 0167 01       		.uleb128 0x1
+ 315 0168 52       		.byte	0x52
+ 316 0169 02       		.uleb128 0x2
+ 317 016a 09       		.byte	0x9
+ 318 016b 83       		.byte	0x83
+ 319 016c 00       		.byte	0
+ 320 016d 0C       		.uleb128 0xc
+ 321 016e 22000000 		.4byte	.LVL3
+ 322 0172 12020000 		.4byte	0x212
+ 323 0176 0B       		.uleb128 0xb
+ 324 0177 01       		.uleb128 0x1
+ 325 0178 50       		.byte	0x50
+ 326 0179 01       		.uleb128 0x1
+ 327 017a 4D       		.byte	0x4d
+ 328 017b 0B       		.uleb128 0xb
+ 329 017c 01       		.uleb128 0x1
+ 330 017d 51       		.byte	0x51
+ 331 017e 01       		.uleb128 0x1
+ 332 017f 3F       		.byte	0x3f
+ 333 0180 00       		.byte	0
+ 334 0181 00       		.byte	0
+ 335 0182 0D       		.uleb128 0xd
+ 336 0183 27020000 		.4byte	.LASF33
+ 337 0187 01       		.byte	0x1
+ 338 0188 2A       		.byte	0x2a
+ 339 0189 00000000 		.4byte	.LFB69
+ 340 018d 40000000 		.4byte	.LFE69-.LFB69
+ 341 0191 01       		.uleb128 0x1
+ 342 0192 9C       		.byte	0x9c
+ 343 0193 D5010000 		.4byte	0x1d5
+ 344 0197 0E       		.uleb128 0xe
+ 345 0198 4E000000 		.4byte	.LASF34
+ 346 019c 01       		.byte	0x1
+ 347 019d 2A       		.byte	0x2a
+ 348 019e D5010000 		.4byte	0x1d5
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 8
+
+
+ 349 01a2 00000000 		.4byte	.LLST0
+ 350 01a6 0F       		.uleb128 0xf
+ 351 01a7 78797A00 		.ascii	"xyz\000"
+ 352 01ab 01       		.byte	0x1
+ 353 01ac 2C       		.byte	0x2c
+ 354 01ad DB010000 		.4byte	0x1db
+ 355 01b1 02       		.uleb128 0x2
+ 356 01b2 91       		.byte	0x91
+ 357 01b3 70       		.sleb128 -16
+ 358 01b4 0C       		.uleb128 0xc
+ 359 01b5 12000000 		.4byte	.LVL6
+ 360 01b9 1D020000 		.4byte	0x21d
+ 361 01bd 0B       		.uleb128 0xb
+ 362 01be 01       		.uleb128 0x1
+ 363 01bf 50       		.byte	0x50
+ 364 01c0 01       		.uleb128 0x1
+ 365 01c1 4D       		.byte	0x4d
+ 366 01c2 0B       		.uleb128 0xb
+ 367 01c3 01       		.uleb128 0x1
+ 368 01c4 51       		.byte	0x51
+ 369 01c5 02       		.uleb128 0x2
+ 370 01c6 09       		.byte	0x9
+ 371 01c7 A8       		.byte	0xa8
+ 372 01c8 0B       		.uleb128 0xb
+ 373 01c9 01       		.uleb128 0x1
+ 374 01ca 52       		.byte	0x52
+ 375 01cb 02       		.uleb128 0x2
+ 376 01cc 7D       		.byte	0x7d
+ 377 01cd 00       		.sleb128 0
+ 378 01ce 0B       		.uleb128 0xb
+ 379 01cf 01       		.uleb128 0x1
+ 380 01d0 53       		.byte	0x53
+ 381 01d1 01       		.uleb128 0x1
+ 382 01d2 36       		.byte	0x36
+ 383 01d3 00       		.byte	0
+ 384 01d4 00       		.byte	0
+ 385 01d5 10       		.uleb128 0x10
+ 386 01d6 04       		.byte	0x4
+ 387 01d7 DC000000 		.4byte	0xdc
+ 388 01db 11       		.uleb128 0x11
+ 389 01dc 93000000 		.4byte	0x93
+ 390 01e0 EB010000 		.4byte	0x1eb
+ 391 01e4 12       		.uleb128 0x12
+ 392 01e5 D5000000 		.4byte	0xd5
+ 393 01e9 05       		.byte	0x5
+ 394 01ea 00       		.byte	0
+ 395 01eb 13       		.uleb128 0x13
+ 396 01ec 29010000 		.4byte	.LASF35
+ 397 01f0 08       		.byte	0x8
+ 398 01f1 1207     		.2byte	0x712
+ 399 01f3 F7010000 		.4byte	0x1f7
+ 400 01f7 14       		.uleb128 0x14
+ 401 01f8 A9000000 		.4byte	0xa9
+ 402 01fc 15       		.uleb128 0x15
+ 403 01fd 3E000000 		.4byte	.LASF24
+ 404 0201 3E000000 		.4byte	.LASF24
+ 405 0205 06       		.byte	0x6
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 9
+
+
+ 406 0206 93       		.byte	0x93
+ 407 0207 15       		.uleb128 0x15
+ 408 0208 4B010000 		.4byte	.LASF25
+ 409 020c 4B010000 		.4byte	.LASF25
+ 410 0210 07       		.byte	0x7
+ 411 0211 09       		.byte	0x9
+ 412 0212 15       		.uleb128 0x15
+ 413 0213 0E000000 		.4byte	.LASF26
+ 414 0217 0E000000 		.4byte	.LASF26
+ 415 021b 07       		.byte	0x7
+ 416 021c 0A       		.byte	0xa
+ 417 021d 15       		.uleb128 0x15
+ 418 021e BF010000 		.4byte	.LASF27
+ 419 0222 BF010000 		.4byte	.LASF27
+ 420 0226 07       		.byte	0x7
+ 421 0227 0B       		.byte	0xb
+ 422 0228 00       		.byte	0
+ 423              		.section	.debug_abbrev,"",%progbits
+ 424              	.Ldebug_abbrev0:
+ 425 0000 01       		.uleb128 0x1
+ 426 0001 11       		.uleb128 0x11
+ 427 0002 01       		.byte	0x1
+ 428 0003 25       		.uleb128 0x25
+ 429 0004 0E       		.uleb128 0xe
+ 430 0005 13       		.uleb128 0x13
+ 431 0006 0B       		.uleb128 0xb
+ 432 0007 03       		.uleb128 0x3
+ 433 0008 0E       		.uleb128 0xe
+ 434 0009 1B       		.uleb128 0x1b
+ 435 000a 0E       		.uleb128 0xe
+ 436 000b 55       		.uleb128 0x55
+ 437 000c 17       		.uleb128 0x17
+ 438 000d 11       		.uleb128 0x11
+ 439 000e 01       		.uleb128 0x1
+ 440 000f 10       		.uleb128 0x10
+ 441 0010 17       		.uleb128 0x17
+ 442 0011 00       		.byte	0
+ 443 0012 00       		.byte	0
+ 444 0013 02       		.uleb128 0x2
+ 445 0014 24       		.uleb128 0x24
+ 446 0015 00       		.byte	0
+ 447 0016 0B       		.uleb128 0xb
+ 448 0017 0B       		.uleb128 0xb
+ 449 0018 3E       		.uleb128 0x3e
+ 450 0019 0B       		.uleb128 0xb
+ 451 001a 03       		.uleb128 0x3
+ 452 001b 08       		.uleb128 0x8
+ 453 001c 00       		.byte	0
+ 454 001d 00       		.byte	0
+ 455 001e 03       		.uleb128 0x3
+ 456 001f 24       		.uleb128 0x24
+ 457 0020 00       		.byte	0
+ 458 0021 0B       		.uleb128 0xb
+ 459 0022 0B       		.uleb128 0xb
+ 460 0023 3E       		.uleb128 0x3e
+ 461 0024 0B       		.uleb128 0xb
+ 462 0025 03       		.uleb128 0x3
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 10
+
+
+ 463 0026 0E       		.uleb128 0xe
+ 464 0027 00       		.byte	0
+ 465 0028 00       		.byte	0
+ 466 0029 04       		.uleb128 0x4
+ 467 002a 16       		.uleb128 0x16
+ 468 002b 00       		.byte	0
+ 469 002c 03       		.uleb128 0x3
+ 470 002d 0E       		.uleb128 0xe
+ 471 002e 3A       		.uleb128 0x3a
+ 472 002f 0B       		.uleb128 0xb
+ 473 0030 3B       		.uleb128 0x3b
+ 474 0031 0B       		.uleb128 0xb
+ 475 0032 49       		.uleb128 0x49
+ 476 0033 13       		.uleb128 0x13
+ 477 0034 00       		.byte	0
+ 478 0035 00       		.byte	0
+ 479 0036 05       		.uleb128 0x5
+ 480 0037 16       		.uleb128 0x16
+ 481 0038 00       		.byte	0
+ 482 0039 03       		.uleb128 0x3
+ 483 003a 0E       		.uleb128 0xe
+ 484 003b 3A       		.uleb128 0x3a
+ 485 003c 0B       		.uleb128 0xb
+ 486 003d 3B       		.uleb128 0x3b
+ 487 003e 05       		.uleb128 0x5
+ 488 003f 49       		.uleb128 0x49
+ 489 0040 13       		.uleb128 0x13
+ 490 0041 00       		.byte	0
+ 491 0042 00       		.byte	0
+ 492 0043 06       		.uleb128 0x6
+ 493 0044 13       		.uleb128 0x13
+ 494 0045 01       		.byte	0x1
+ 495 0046 03       		.uleb128 0x3
+ 496 0047 0E       		.uleb128 0xe
+ 497 0048 0B       		.uleb128 0xb
+ 498 0049 0B       		.uleb128 0xb
+ 499 004a 3A       		.uleb128 0x3a
+ 500 004b 0B       		.uleb128 0xb
+ 501 004c 3B       		.uleb128 0x3b
+ 502 004d 0B       		.uleb128 0xb
+ 503 004e 01       		.uleb128 0x1
+ 504 004f 13       		.uleb128 0x13
+ 505 0050 00       		.byte	0
+ 506 0051 00       		.byte	0
+ 507 0052 07       		.uleb128 0x7
+ 508 0053 0D       		.uleb128 0xd
+ 509 0054 00       		.byte	0
+ 510 0055 03       		.uleb128 0x3
+ 511 0056 0E       		.uleb128 0xe
+ 512 0057 3A       		.uleb128 0x3a
+ 513 0058 0B       		.uleb128 0xb
+ 514 0059 3B       		.uleb128 0x3b
+ 515 005a 0B       		.uleb128 0xb
+ 516 005b 49       		.uleb128 0x49
+ 517 005c 13       		.uleb128 0x13
+ 518 005d 38       		.uleb128 0x38
+ 519 005e 0B       		.uleb128 0xb
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 11
+
+
+ 520 005f 00       		.byte	0
+ 521 0060 00       		.byte	0
+ 522 0061 08       		.uleb128 0x8
+ 523 0062 2E       		.uleb128 0x2e
+ 524 0063 01       		.byte	0x1
+ 525 0064 3F       		.uleb128 0x3f
+ 526 0065 19       		.uleb128 0x19
+ 527 0066 03       		.uleb128 0x3
+ 528 0067 0E       		.uleb128 0xe
+ 529 0068 3A       		.uleb128 0x3a
+ 530 0069 0B       		.uleb128 0xb
+ 531 006a 3B       		.uleb128 0x3b
+ 532 006b 0B       		.uleb128 0xb
+ 533 006c 27       		.uleb128 0x27
+ 534 006d 19       		.uleb128 0x19
+ 535 006e 49       		.uleb128 0x49
+ 536 006f 13       		.uleb128 0x13
+ 537 0070 11       		.uleb128 0x11
+ 538 0071 01       		.uleb128 0x1
+ 539 0072 12       		.uleb128 0x12
+ 540 0073 06       		.uleb128 0x6
+ 541 0074 40       		.uleb128 0x40
+ 542 0075 18       		.uleb128 0x18
+ 543 0076 9742     		.uleb128 0x2117
+ 544 0078 19       		.uleb128 0x19
+ 545 0079 01       		.uleb128 0x1
+ 546 007a 13       		.uleb128 0x13
+ 547 007b 00       		.byte	0
+ 548 007c 00       		.byte	0
+ 549 007d 09       		.uleb128 0x9
+ 550 007e 898201   		.uleb128 0x4109
+ 551 0081 00       		.byte	0
+ 552 0082 11       		.uleb128 0x11
+ 553 0083 01       		.uleb128 0x1
+ 554 0084 31       		.uleb128 0x31
+ 555 0085 13       		.uleb128 0x13
+ 556 0086 00       		.byte	0
+ 557 0087 00       		.byte	0
+ 558 0088 0A       		.uleb128 0xa
+ 559 0089 898201   		.uleb128 0x4109
+ 560 008c 01       		.byte	0x1
+ 561 008d 11       		.uleb128 0x11
+ 562 008e 01       		.uleb128 0x1
+ 563 008f 31       		.uleb128 0x31
+ 564 0090 13       		.uleb128 0x13
+ 565 0091 01       		.uleb128 0x1
+ 566 0092 13       		.uleb128 0x13
+ 567 0093 00       		.byte	0
+ 568 0094 00       		.byte	0
+ 569 0095 0B       		.uleb128 0xb
+ 570 0096 8A8201   		.uleb128 0x410a
+ 571 0099 00       		.byte	0
+ 572 009a 02       		.uleb128 0x2
+ 573 009b 18       		.uleb128 0x18
+ 574 009c 9142     		.uleb128 0x2111
+ 575 009e 18       		.uleb128 0x18
+ 576 009f 00       		.byte	0
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 12
+
+
+ 577 00a0 00       		.byte	0
+ 578 00a1 0C       		.uleb128 0xc
+ 579 00a2 898201   		.uleb128 0x4109
+ 580 00a5 01       		.byte	0x1
+ 581 00a6 11       		.uleb128 0x11
+ 582 00a7 01       		.uleb128 0x1
+ 583 00a8 31       		.uleb128 0x31
+ 584 00a9 13       		.uleb128 0x13
+ 585 00aa 00       		.byte	0
+ 586 00ab 00       		.byte	0
+ 587 00ac 0D       		.uleb128 0xd
+ 588 00ad 2E       		.uleb128 0x2e
+ 589 00ae 01       		.byte	0x1
+ 590 00af 3F       		.uleb128 0x3f
+ 591 00b0 19       		.uleb128 0x19
+ 592 00b1 03       		.uleb128 0x3
+ 593 00b2 0E       		.uleb128 0xe
+ 594 00b3 3A       		.uleb128 0x3a
+ 595 00b4 0B       		.uleb128 0xb
+ 596 00b5 3B       		.uleb128 0x3b
+ 597 00b6 0B       		.uleb128 0xb
+ 598 00b7 27       		.uleb128 0x27
+ 599 00b8 19       		.uleb128 0x19
+ 600 00b9 11       		.uleb128 0x11
+ 601 00ba 01       		.uleb128 0x1
+ 602 00bb 12       		.uleb128 0x12
+ 603 00bc 06       		.uleb128 0x6
+ 604 00bd 40       		.uleb128 0x40
+ 605 00be 18       		.uleb128 0x18
+ 606 00bf 9742     		.uleb128 0x2117
+ 607 00c1 19       		.uleb128 0x19
+ 608 00c2 01       		.uleb128 0x1
+ 609 00c3 13       		.uleb128 0x13
+ 610 00c4 00       		.byte	0
+ 611 00c5 00       		.byte	0
+ 612 00c6 0E       		.uleb128 0xe
+ 613 00c7 05       		.uleb128 0x5
+ 614 00c8 00       		.byte	0
+ 615 00c9 03       		.uleb128 0x3
+ 616 00ca 0E       		.uleb128 0xe
+ 617 00cb 3A       		.uleb128 0x3a
+ 618 00cc 0B       		.uleb128 0xb
+ 619 00cd 3B       		.uleb128 0x3b
+ 620 00ce 0B       		.uleb128 0xb
+ 621 00cf 49       		.uleb128 0x49
+ 622 00d0 13       		.uleb128 0x13
+ 623 00d1 02       		.uleb128 0x2
+ 624 00d2 17       		.uleb128 0x17
+ 625 00d3 00       		.byte	0
+ 626 00d4 00       		.byte	0
+ 627 00d5 0F       		.uleb128 0xf
+ 628 00d6 34       		.uleb128 0x34
+ 629 00d7 00       		.byte	0
+ 630 00d8 03       		.uleb128 0x3
+ 631 00d9 08       		.uleb128 0x8
+ 632 00da 3A       		.uleb128 0x3a
+ 633 00db 0B       		.uleb128 0xb
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 13
+
+
+ 634 00dc 3B       		.uleb128 0x3b
+ 635 00dd 0B       		.uleb128 0xb
+ 636 00de 49       		.uleb128 0x49
+ 637 00df 13       		.uleb128 0x13
+ 638 00e0 02       		.uleb128 0x2
+ 639 00e1 18       		.uleb128 0x18
+ 640 00e2 00       		.byte	0
+ 641 00e3 00       		.byte	0
+ 642 00e4 10       		.uleb128 0x10
+ 643 00e5 0F       		.uleb128 0xf
+ 644 00e6 00       		.byte	0
+ 645 00e7 0B       		.uleb128 0xb
+ 646 00e8 0B       		.uleb128 0xb
+ 647 00e9 49       		.uleb128 0x49
+ 648 00ea 13       		.uleb128 0x13
+ 649 00eb 00       		.byte	0
+ 650 00ec 00       		.byte	0
+ 651 00ed 11       		.uleb128 0x11
+ 652 00ee 01       		.uleb128 0x1
+ 653 00ef 01       		.byte	0x1
+ 654 00f0 49       		.uleb128 0x49
+ 655 00f1 13       		.uleb128 0x13
+ 656 00f2 01       		.uleb128 0x1
+ 657 00f3 13       		.uleb128 0x13
+ 658 00f4 00       		.byte	0
+ 659 00f5 00       		.byte	0
+ 660 00f6 12       		.uleb128 0x12
+ 661 00f7 21       		.uleb128 0x21
+ 662 00f8 00       		.byte	0
+ 663 00f9 49       		.uleb128 0x49
+ 664 00fa 13       		.uleb128 0x13
+ 665 00fb 2F       		.uleb128 0x2f
+ 666 00fc 0B       		.uleb128 0xb
+ 667 00fd 00       		.byte	0
+ 668 00fe 00       		.byte	0
+ 669 00ff 13       		.uleb128 0x13
+ 670 0100 34       		.uleb128 0x34
+ 671 0101 00       		.byte	0
+ 672 0102 03       		.uleb128 0x3
+ 673 0103 0E       		.uleb128 0xe
+ 674 0104 3A       		.uleb128 0x3a
+ 675 0105 0B       		.uleb128 0xb
+ 676 0106 3B       		.uleb128 0x3b
+ 677 0107 05       		.uleb128 0x5
+ 678 0108 49       		.uleb128 0x49
+ 679 0109 13       		.uleb128 0x13
+ 680 010a 3F       		.uleb128 0x3f
+ 681 010b 19       		.uleb128 0x19
+ 682 010c 3C       		.uleb128 0x3c
+ 683 010d 19       		.uleb128 0x19
+ 684 010e 00       		.byte	0
+ 685 010f 00       		.byte	0
+ 686 0110 14       		.uleb128 0x14
+ 687 0111 35       		.uleb128 0x35
+ 688 0112 00       		.byte	0
+ 689 0113 49       		.uleb128 0x49
+ 690 0114 13       		.uleb128 0x13
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 14
+
+
+ 691 0115 00       		.byte	0
+ 692 0116 00       		.byte	0
+ 693 0117 15       		.uleb128 0x15
+ 694 0118 2E       		.uleb128 0x2e
+ 695 0119 00       		.byte	0
+ 696 011a 3F       		.uleb128 0x3f
+ 697 011b 19       		.uleb128 0x19
+ 698 011c 3C       		.uleb128 0x3c
+ 699 011d 19       		.uleb128 0x19
+ 700 011e 6E       		.uleb128 0x6e
+ 701 011f 0E       		.uleb128 0xe
+ 702 0120 03       		.uleb128 0x3
+ 703 0121 0E       		.uleb128 0xe
+ 704 0122 3A       		.uleb128 0x3a
+ 705 0123 0B       		.uleb128 0xb
+ 706 0124 3B       		.uleb128 0x3b
+ 707 0125 0B       		.uleb128 0xb
+ 708 0126 00       		.byte	0
+ 709 0127 00       		.byte	0
+ 710 0128 00       		.byte	0
+ 711              		.section	.debug_loc,"",%progbits
+ 712              	.Ldebug_loc0:
+ 713              	.LLST0:
+ 714 0000 00000000 		.4byte	.LVL4
+ 715 0004 0E000000 		.4byte	.LVL5
+ 716 0008 0100     		.2byte	0x1
+ 717 000a 50       		.byte	0x50
+ 718 000b 0E000000 		.4byte	.LVL5
+ 719 000f 40000000 		.4byte	.LFE69
+ 720 0013 0100     		.2byte	0x1
+ 721 0015 54       		.byte	0x54
+ 722 0016 00000000 		.4byte	0
+ 723 001a 00000000 		.4byte	0
+ 724              		.section	.debug_aranges,"",%progbits
+ 725 0000 24000000 		.4byte	0x24
+ 726 0004 0200     		.2byte	0x2
+ 727 0006 00000000 		.4byte	.Ldebug_info0
+ 728 000a 04       		.byte	0x4
+ 729 000b 00       		.byte	0
+ 730 000c 0000     		.2byte	0
+ 731 000e 0000     		.2byte	0
+ 732 0010 00000000 		.4byte	.LFB68
+ 733 0014 2E000000 		.4byte	.LFE68-.LFB68
+ 734 0018 00000000 		.4byte	.LFB69
+ 735 001c 40000000 		.4byte	.LFE69-.LFB69
+ 736 0020 00000000 		.4byte	0
+ 737 0024 00000000 		.4byte	0
+ 738              		.section	.debug_ranges,"",%progbits
+ 739              	.Ldebug_ranges0:
+ 740 0000 00000000 		.4byte	.LFB68
+ 741 0004 2E000000 		.4byte	.LFE68
+ 742 0008 00000000 		.4byte	.LFB69
+ 743 000c 40000000 		.4byte	.LFE69
+ 744 0010 00000000 		.4byte	0
+ 745 0014 00000000 		.4byte	0
+ 746              		.section	.debug_line,"",%progbits
+ 747              	.Ldebug_line0:
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 15
+
+
+ 748 0000 B1010000 		.section	.debug_str,"MS",%progbits,1
+ 748      02008101 
+ 748      00000201 
+ 748      FB0E0D00 
+ 748      01010101 
+ 749              	.LASF1:
+ 750 0000 6C6F6E67 		.ascii	"long long int\000"
+ 750      206C6F6E 
+ 750      6720696E 
+ 750      7400
+ 751              	.LASF26:
+ 752 000e 4932435F 		.ascii	"I2C_Read\000"
+ 752      52656164 
+ 752      00
+ 753              	.LASF5:
+ 754 0017 5F5F7569 		.ascii	"__uint8_t\000"
+ 754      6E74385F 
+ 754      7400
+ 755              	.LASF6:
+ 756 0021 5F5F696E 		.ascii	"__int16_t\000"
+ 756      7431365F 
+ 756      7400
+ 757              	.LASF9:
+ 758 002b 5F5F696E 		.ascii	"__int32_t\000"
+ 758      7433325F 
+ 758      7400
+ 759              	.LASF31:
+ 760 0035 61636344 		.ascii	"accData_\000"
+ 760      6174615F 
+ 760      00
+ 761              	.LASF24:
+ 762 003e 4932435F 		.ascii	"I2C_Start\000"
+ 762      53746172 
+ 762      7400
+ 763              	.LASF17:
+ 764 0048 666C6F61 		.ascii	"float\000"
+ 764      7400
+ 765              	.LASF34:
+ 766 004e 64617461 		.ascii	"data\000"
+ 766      00
+ 767              	.LASF32:
+ 768 0053 4C534D33 		.ascii	"LSM303D_Start\000"
+ 768      3033445F 
+ 768      53746172 
+ 768      7400
+ 769              	.LASF21:
+ 770 0061 61636358 		.ascii	"accX\000"
+ 770      00
+ 771              	.LASF22:
+ 772 0066 61636359 		.ascii	"accY\000"
+ 772      00
+ 773              	.LASF23:
+ 774 006b 6163635A 		.ascii	"accZ\000"
+ 774      00
+ 775              	.LASF28:
+ 776 0070 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 776      43313120 
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 16
+
+
+ 776      352E342E 
+ 776      31203230 
+ 776      31363036 
+ 777 00a3 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 777      20726576 
+ 777      6973696F 
+ 777      6E203233 
+ 777      37373135 
+ 778 00d6 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 778      66756E63 
+ 778      74696F6E 
+ 778      2D736563 
+ 778      74696F6E 
+ 779              	.LASF16:
+ 780 00fe 696E7431 		.ascii	"int16\000"
+ 780      3600
+ 781              	.LASF11:
+ 782 0104 6C6F6E67 		.ascii	"long unsigned int\000"
+ 782      20756E73 
+ 782      69676E65 
+ 782      6420696E 
+ 782      7400
+ 783              	.LASF8:
+ 784 0116 73686F72 		.ascii	"short unsigned int\000"
+ 784      7420756E 
+ 784      7369676E 
+ 784      65642069 
+ 784      6E7400
+ 785              	.LASF35:
+ 786 0129 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 786      52784275 
+ 786      66666572 
+ 786      00
+ 787              	.LASF4:
+ 788 0136 756E7369 		.ascii	"unsigned char\000"
+ 788      676E6564 
+ 788      20636861 
+ 788      7200
+ 789              	.LASF18:
+ 790 0144 646F7562 		.ascii	"double\000"
+ 790      6C6500
+ 791              	.LASF25:
+ 792 014b 4932435F 		.ascii	"I2C_Write\000"
+ 792      57726974 
+ 792      6500
+ 793              	.LASF0:
+ 794 0155 756E7369 		.ascii	"unsigned int\000"
+ 794      676E6564 
+ 794      20696E74 
+ 794      00
+ 795              	.LASF12:
+ 796 0162 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 796      206C6F6E 
+ 796      6720756E 
+ 796      7369676E 
+ 796      65642069 
+ 797              	.LASF13:
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 17
+
+
+ 798 0179 75696E74 		.ascii	"uint8_t\000"
+ 798      385F7400 
+ 799              	.LASF14:
+ 800 0181 696E7431 		.ascii	"int16_t\000"
+ 800      365F7400 
+ 801              	.LASF29:
+ 802 0189 5A756D6F 		.ascii	"ZumoLibrary\\LSM303D.c\000"
+ 802      4C696272 
+ 802      6172795C 
+ 802      4C534D33 
+ 802      3033442E 
+ 803              	.LASF15:
+ 804 019f 696E7433 		.ascii	"int32_t\000"
+ 804      325F7400 
+ 805              	.LASF20:
+ 806 01a7 73697A65 		.ascii	"sizetype\000"
+ 806      74797065 
+ 806      00
+ 807              	.LASF19:
+ 808 01b0 63686172 		.ascii	"char\000"
+ 808      00
+ 809              	.LASF7:
+ 810 01b5 73686F72 		.ascii	"short int\000"
+ 810      7420696E 
+ 810      7400
+ 811              	.LASF27:
+ 812 01bf 4932435F 		.ascii	"I2C_Read_Multiple\000"
+ 812      52656164 
+ 812      5F4D756C 
+ 812      7469706C 
+ 812      6500
+ 813              	.LASF10:
+ 814 01d1 6C6F6E67 		.ascii	"long int\000"
+ 814      20696E74 
+ 814      00
+ 815              	.LASF2:
+ 816 01da 6C6F6E67 		.ascii	"long double\000"
+ 816      20646F75 
+ 816      626C6500 
+ 817              	.LASF30:
+ 818 01e6 433A5C55 		.ascii	"C:\\Users\\samue\\Desktop\\RobotRage2\\Zumo\\ZumoBo"
+ 818      73657273 
+ 818      5C73616D 
+ 818      75655C44 
+ 818      65736B74 
+ 819 0213 742E6379 		.ascii	"t.cydsn\000"
+ 819      64736E00 
+ 820              	.LASF3:
+ 821 021b 7369676E 		.ascii	"signed char\000"
+ 821      65642063 
+ 821      68617200 
+ 822              	.LASF33:
+ 823 0227 4C534D33 		.ascii	"LSM303D_Read_Acc\000"
+ 823      3033445F 
+ 823      52656164 
+ 823      5F416363 
+ 823      00
+ARM GAS  C:\Users\samue\AppData\Local\Temp\ccOkP4b7.s 			page 18
+
+
+ 824              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
